@@ -1,0 +1,17 @@
+@import '~antd/dist/antd.css';
+
+.App {
+  text-align: center;
+  margin-top: 3%;
+
+}
+
+.classCard {
+  
+  width: 90%;
+  margin: 0px auto 2em auto ;
+}
+
+.Form.Label {
+  text-align: left;
+}

@@ -1,0 +1,35 @@
+#logo{
+	height: 4.3em;
+}
+
+#searchbar{
+	width: 200%;
+}
+
+.input-group-append {
+	background-color: transparent;
+}
+
+.nav-item{
+	margin: 0.8em;
+}
+
+.navbar-nav.navbar-right li a {
+	font-size: 1.05em;
+    color: #3d3d3d ;
+}
+
+#navcontainer{
+	width:52%;
+}
+
+.navbar{
+	border-bottom: 1px solid lightgray ;
+}
+.navbar li a:hover {
+  border-bottom: 1.3px solid gray;
+}
+
+.navbar li a.active {
+  border-bottom: 1.3px solid gray;
+}
