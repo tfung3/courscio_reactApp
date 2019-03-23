@@ -2,39 +2,136 @@
 import React, { Component } from 'react';
 import {Card, Container, Row, Col, Form, Button, ButtonToolbar, ToggleButton, ToggleButtonGroup, Popover, OverlayTrigger} from 'react-bootstrap';
 import {Slider, Switch, Icon} from 'antd';
+import axios from 'axios';
 import './App.css';
+
+const API = '/api/v1/course/filters?'
+const DEFAULT_QUERY = 'credit=4&major=Computer%20Science&semester=Fall%202019&weekdays=TUE&weekdays=THU'
 
 class App extends Component {
   constructor(props) {
     super(props)
 
-    const course = [
-      {id: 0, title: "Math", overview:"bullshit"},
-      {id: 1, title: "Heat", overview:"bullshit"},
-    ] 
+    this.state = {
+      courses: [],
+      isLoading: false,
+      err: false,
+      dept: "Computer Science",
+      weekdays: [],
+    }
 
-    var courseRows = []
-    course.forEach((course) => {
-      console.log(course.title)
-      const courseRow = <Card className="classCard" bg="dark" text="white" key={course.id}>
+    this.ReMount = this.ReMount.bind(this)
+  }
+
+  async componentDidMount() {
+    this.setState({
+      isLoading: true
+    });
+
+    console.log("TO ROWS")
+
+    try{
+      var courseRows = []
+      console.log("loop")
+      const response = await axios.get(API + DEFAULT_QUERY)
+      console.log("wait over")
+      console.log(response)
+      response.data.forEach((course) => {
+        const courseRow = <Card className="classCard" bg="dark" text="white" key={course.key}>
             <Card.Body>
-              <Card.Title>{course.title}</Card.Title>
+              <Card.Title>{course.cname}</Card.Title>
               <Card.Text>
-                {course.overview}
+                {course.title}
               </Card.Text>
             </Card.Body>
             <br />
           </Card>
-      
-      courseRows.push(courseRow)
-    })
-
-    this.state = {rows: courseRows }
-
-
+        courseRows.push(courseRow)
+      })
+      this.setState({
+        courses: courseRows
+      })
+    } catch {
+      this.setState({
+        err: true,
+        isLoading: false
+      })
+    }
   }
-  render(){ 
-    const marks = {
+
+  async ReMount(subject, weekday){
+    this.setState({
+      isLoading: true,
+      courses:[]
+    });
+    if (subject === 'NONE'){
+      subject = this.state.dept
+    }else{
+      this.setState({
+        dept: subject
+      })
+    }
+
+    console.log(subject);
+
+    const weekdays = this.state.weekdays
+    console.log(weekdays)
+    console.log(weekday)
+    if (weekdays.includes(weekday)){
+      var index = weekdays.indexOf(weekday)
+      const newdays = weekdays.slice(0, index).concat(weekdays.slice(index+1,weekdays.length))
+      console.log(newdays)
+      this.setState({
+        weekdays: newdays
+      })
+    }else{
+      let days = this.state.weekdays
+      days.push(weekday)
+      console.log(days)
+      this.setState({
+        weekdays: days
+      })
+    }
+
+    try{
+      var courseRows = []
+      let query = 'credit=4&major=' + subject + '&semester=Fall%202019'
+      const weekdays = this.state.weekdays
+      weekdays.forEach((day)=>{
+        query = query + '&weekdays=' + day
+      })
+      console.log(query)
+      const response = await axios.get(API + query)
+      console.log("wait over")
+      console.log(response)
+      response.data.forEach((course) => {
+        const courseRow = <Card className="classCard" bg="dark" text="white">
+            <Card.Body>
+              <Card.Title>{course.cname}</Card.Title>
+              <Card.Text>
+                {course.title}
+              </Card.Text>
+            </Card.Body>
+            <br />
+          </Card>
+        courseRows.push(courseRow)
+      })
+      this.setState({
+        courses: courseRows
+      })
+    } catch {
+      this.setState({
+        err: true,
+        isLoading: false
+      })
+    }
+  }
+
+
+//  }
+render(){ 
+
+  const marks = {
       0: '8am',
       8.33: '',
       16.66: '',
@@ -55,11 +152,9 @@ class App extends Component {
                   And here's some <strong>amazing</strong> content. It's very engaging. right?
                 </Popover>
               );
-
     return (
       <div className="App">
         <div Container>
-
           <Row>
             <Col className="filterLarge" xs={0} md={0} lg={1}>
             </Col>
@@ -83,96 +178,96 @@ class App extends Component {
                 </Form.Group>
 
                 <Form.Group as={Col} className="formGroup" controlId="formGridDept">
-                    <Form.Control as="select" className="formControl">
+                    <Form.Control as="select" className="formControl" onChange={(event) => this.ReMount(event.target.value)}>
                         <option hidden>Department</option>
-                        <option value="AAS">AAS - African &amp; African-American Studies</option>
-                        <option value="AH">AH - Art &amp; Art History-Art History</option>
-                        <option value="ANT">ANT - Anthropology</option>
-                        <option value="ARA">ARA - Religion &amp; Classics - Arabic</option>
-                        <option value="ASL">ASL - American Sign Language</option>
-                        <option value="AME">AME - Audio Music Engineering</option>
-                        <option value="AMS">AMS - American Studies</option>
-                        <option value="AST">AST - Astronomy</option>
-                        <option value="ATH">ATH - Archeology Tech &amp; Hist Structure</option>
-                        <option value="BCS">BCS - Brain and Cognitive Sciences</option>
-                        <option value="BIO">BIO - Biology</option>
-                        <option value="BME">BME - Biomedical Engineering</option>
-                        <option value="CAS">CAS - College of Arts &amp; Science</option>
-                        <option value="CGR">CGR - Religion &amp; Classics - Classical Greek</option>
-                        <option value="CHE">CHE - Chemical Engineering</option>
-                        <option value="CHI">CHI - Modern Languages &amp; Cultures - Chinese</option>
-                        <option value="CHM">CHM - Chemistry</option>
-                        <option value="CLA">CLA - Religion &amp; Classics - Classical Studies</option>
-                        <option value="CLT">CLT - Modern Languages &amp; Cultures - Comparative Literature</option>
-                        <option value="CSC">CSC - Computer Science</option>
-                        <option value="CSP">CSP - Clinical and Social Sciences in Psychology</option>
-                        <option value="CVS">CVS - Center for Visual Science</option>
-                        <option value="DAN">DAN - Dance</option>
-                        <option value="DSC">DSC - Data Science &amp; Computation</option>
-                        <option value="DH">DH - Digital Humanities</option>
-                        <option value="DMS">DMS - Digital Media Studies</option>
-                        <option value="EAS">EAS - Engineering and Applied Sciences</option>
-                        <option value="ECE">ECE - Electrical and Computer Engineering</option>
-                        <option value="ECO">ECO - Economics</option>
-                        <option value="EES">EES - Earth &amp; Environmental Science</option>
-                        <option value="EHU">EHU - Environmental Humanities</option>
-                        <option value="ELP">ELP - English Language Program</option>
-                        <option value="ENG">ENG - English</option>
-                        <option value="ERG">ERG - Alternative Energy</option>
-                        <option value="FMS">FMS - Film and Media Studies</option>
-                        <option value="FR">FR - Modern Languages &amp; Cultures - French</option>
-                        <option value="GER">GER - Modern Languages &amp; Cultures - German</option>
-                        <option value="GSW">GSW - Gender, Sexuality &amp; Women's Studies</option>
-                        <option value="GRK">GRK - Religion &amp; Classics - Greek</option>
-                        <option value="HEB">HEB - Religion &amp; Classics - Hebrew</option>
-                        <option value="HIS">HIS - History</option>
-                        <option value="HLS">HLS - Health and Society</option>
-                        <option value="IEP">IEP - Intensive English Program</option>
-                        <option value="IR">IR - International Relations</option>
-                        <option value="IT">IT - Modern Languages &amp; Cultures - Italian</option>
-                        <option value="JPN">JPN - Modern Languages &amp; Cultures - Japanese</option>
-                        <option value="JST">JST - Judaic Studies</option>
-                        <option value="KOR">KOR - Modern Languages &amp; Cultures - Korean</option>
-                        <option value="LAT">LAT - Religion &amp; Classics - Latin</option>
-                        <option value="LIN">LIN - Linguistics</option>
-                        <option value="LTS">LTS - Literary Translation Studies</option>
-                        <option value="MTH">MTH - Mathematics</option>
-                        <option value="MSC">MSC - Materials Science</option>
-                        <option value="ME">ME - Mechanical Engineering</option>
-                        <option value="MUR">MUR - Music</option>
-                        <option value="NAV">NAV - Naval Science</option>
-                        <option value="NSC">NSC - Neuroscience</option>
-                        <option value="OPT">OPT - Optics</option>
-                        <option value="PEC">PEC - Wallis Institute of Political Economics</option>
-                        <option value="PH">PH - Public Health</option>
-                        <option value="PHL">PHL - Philosophy</option>
-                        <option value="PPC">PPC - Photographic Preservation &amp; Collections Management</option>
-                        <option value="PHY">PHY - Physics</option>
-                        <option value="POL">POL - Modern Languages &amp; Cultures - Polish</option>
-                        <option value="POR">POR - Modern Languages &amp; Cultures - Portuguese</option>
-                        <option value="PSC">PSC - Political Science</option>
-                        <option value="PSY">PSY - Psychology</option>
-                        <option value="REL">REL - Religion and Classics</option>
-                        <option value="RST">RST - Modern Languages &amp; Cultures - Russian Studies</option>
-                        <option value="RUS">RUS - Modern Languages &amp; Cultures - Russian</option>
-                        <option value="SA">SA - Art &amp; Art History-Studio Arts</option>
-                        <option value="SAB">SAB - Study Abroad</option>
-                        <option value="SEN">SEN - Social Entrepreneurship</option>
-                        <option value="SKT">SKT - Religion &amp; Classics - Sanskrit</option>
-                        <option value="SOC">SOC - Sociology</option>
-                        <option value="SP">SP - Modern Languages &amp; Cultures - Spanish</option>
-                        <option value="STT">STT - Statistics</option>
-                        <option value="SUS">SUS - Sustainability</option>
-                        <option value="TCS">TCS - TEAM Computer Science</option>
-                        <option value="TEB">TEB - TEAM Biomedical Engineering</option>
-                        <option value="TEC">TEC - TEAM Chemical Engineering</option>
-                        <option value="TEE">TEE - TEAM Electrical Engineering</option>
-                        <option value="TEM">TEM - Technical Entrepreneurship Management</option>
-                        <option value="TEO">TEO - TEAM Optics</option>
-                        <option value="TME">TME - TEAM Mechanical Engineering</option>
-                        <option value="TUR">TUR - Religion &amp; Classics - Turkish</option>
-                        <option value="WST">WST - Women's Studies (see GSW for current courses)</option>
-                        <option value="WRT">WRT - Writing Program</option>
+                        <option value="African &amp; African-American Studies">AAS - African &amp; African-American Studies</option>
+                        <option value="Art &amp; Art History-Art History">AH - Art &amp; Art History-Art History</option>
+                        <option value="Anthropology">ANT - Anthropology</option>
+                        <option value="Religion &amp; Classics - Arabic">ARA - Religion &amp; Classics - Arabic</option>
+                        <option value="American Sign Language">ASL - American Sign Language</option>
+                        <option value="Audio Music Engineering">AME - Audio Music Engineering</option>
+                        <option value="American Studies">AMS - American Studies</option>
+                        <option value="Astronomy">AST - Astronomy</option>
+                        <option value="Archeology Tech &amp; Hist Structure">ATH - Archeology Tech &amp; Hist Structure</option>
+                        <option value="Brain and Cognitive Sciences">BCS - Brain and Cognitive Sciences</option>
+                        <option value="Biology">BIO - Biology</option>
+                        <option value="Biomedical Engineering">BME - Biomedical Engineering</option>
+                        <option value="College of Arts &amp; Science">CAS - College of Arts &amp; Science</option>
+                        <option value="Religion &amp; Classics - Classical Greek">CGR - Religion &amp; Classics - Classical Greek</option>
+                        <option value="Chemical Engineering">CHE - Chemical Engineering</option>
+                        <option value="Modern Languages &amp; Cultures - Chinese">CHI - Modern Languages &amp; Cultures - Chinese</option>
+                        <option value="Chemistry">CHM - Chemistry</option>
+                        <option value="Religion &amp; Classics - Classical Studies">CLA - Religion &amp; Classics - Classical Studies</option>
+                        <option value="Modern Languages &amp; Cultures - Comparative Literature">CLT - Modern Languages &amp; Cultures - Comparative Literature</option>
+                        <option value="Computer Science">CSC - Computer Science</option>
+                        <option value="Clinical and Social Sciences in Psychology">CSP - Clinical and Social Sciences in Psychology</option>
+                        <option value="Center for Visual Science">CVS - Center for Visual Science</option>
+                        <option value="Dance">DAN - Dance</option>
+                        <option value="Data Science &amp; Computation">DSC - Data Science &amp; Computation</option>
+                        <option value="Digital Humanities">DH - Digital Humanities</option>
+                        <option value="Digital Media Studies">DMS - Digital Media Studies</option>
+                        <option value="Engineering and Applied Sciences">EAS - Engineering and Applied Sciences</option>
+                        <option value="Electrical and Computer Engineering">ECE - Electrical and Computer Engineering</option>
+                        <option value="Economics">ECO - Economics</option>
+                        <option value="Earth &amp; Environmental Science">EES - Earth &amp; Environmental Science</option>
+                        <option value="Environmental Humanities">EHU - Environmental Humanities</option>
+                        <option value="English Language Program">ELP - English Language Program</option>
+                        <option value="English">ENG - English</option>
+                        <option value="Alternative Energy">ERG - Alternative Energy</option>
+                        <option value="Film and Media Studies">FMS - Film and Media Studies</option>
+                        <option value="Modern Languages &amp; Cultures - French">FR - Modern Languages &amp; Cultures - French</option>
+                        <option value="Modern Languages &amp; Cultures - German">GER - Modern Languages &amp; Cultures - German</option>
+                        <option value="Gender, Sexuality &amp; Women's Studies">GSW - Gender, Sexuality &amp; Women's Studies</option>
+                        <option value="Religion &amp; Classics - Greek">GRK - Religion &amp; Classics - Greek</option>
+                        <option value="Religion &amp; Classics - Hebrew">HEB - Religion &amp; Classics - Hebrew</option>
+                        <option value="History">HIS - History</option>
+                        <option value="Health and Society">HLS - Health and Society</option>
+                        <option value="Intensive English Program">IEP - Intensive English Program</option>
+                        <option value="International Relations">IR - International Relations</option>
+                        <option value="Modern Languages &amp; Cultures - Italian">IT - Modern Languages &amp; Cultures - Italian</option>
+                        <option value="Modern Languages &amp; Cultures - Japanese">JPN - Modern Languages &amp; Cultures - Japanese</option>
+                        <option value="Judaic Studies">JST - Judaic Studies</option>
+                        <option value="Modern Languages &amp; Cultures - Korean">KOR - Modern Languages &amp; Cultures - Korean</option>
+                        <option value="Religion &amp; Classics - Latin">LAT - Religion &amp; Classics - Latin</option>
+                        <option value="Linguistics">LIN - Linguistics</option>
+                        <option value="Literary Translation Studies">LTS - Literary Translation Studies</option>
+                        <option value="Mathematics">MTH - Mathematics</option>
+                        <option value="Materials Science">MSC - Materials Science</option>
+                        <option value="Mechanical Engineering">ME - Mechanical Engineering</option>
+                        <option value="Music">MUR - Music</option>
+                        <option value="Naval Science">NAV - Naval Science</option>
+                        <option value="Neuroscience">NSC - Neuroscience</option>
+                        <option value="Optics">OPT - Optics</option>
+                        <option value="Wallis Institute of Political Economics">PEC - Wallis Institute of Political Economics</option>
+                        <option value="Public Health">PH - Public Health</option>
+                        <option value="Philosophy">PHL - Philosophy</option>
+                        <option value="Photographic Preservation &amp; Collections Management">PPC - Photographic Preservation &amp; Collections Management</option>
+                        <option value="Physics">PHY - Physics</option>
+                        <option value="Modern Languages &amp; Cultures - Polish">POL - Modern Languages &amp; Cultures - Polish</option>
+                        <option value="Modern Languages &amp; Cultures - Portuguese">POR - Modern Languages &amp; Cultures - Portuguese</option>
+                        <option value="Political Science">PSC - Political Science</option>
+                        <option value="Psychology<">PSY - Psychology</option>
+                        <option value="Religion and Classics">REL - Religion and Classics</option>
+                        <option value="Modern Languages &amp; Cultures - Russian Studies">RST - Modern Languages &amp; Cultures - Russian Studies</option>
+                        <option value="Modern Languages &amp; Cultures - Russian">RUS - Modern Languages &amp; Cultures - Russian</option>
+                        <option value="Art &amp; Art History-Studio Arts">SA - Art &amp; Art History-Studio Arts</option>
+                        <option value="Study Abroad">SAB - Study Abroad</option>
+                        <option value="Social Entrepreneurship">SEN - Social Entrepreneurship</option>
+                        <option value="Religion &amp; Classics - Sanskrit">SKT - Religion &amp; Classics - Sanskrit</option>
+                        <option value="Sociology">SOC - Sociology</option>
+                        <option value="Modern Languages &amp; Cultures - Spanish">SP - Modern Languages &amp; Cultures - Spanish</option>
+                        <option value="Statistics">STT - Statistics</option>
+                        <option value="Sustainabilit">SUS - Sustainability</option>
+                        <option value="TEAM Computer Science">TCS - TEAM Computer Science</option>
+                        <option value="TEAM Biomedical Engineering">TEB - TEAM Biomedical Engineering</option>
+                        <option value="TEAM Chemical Engineering">TEC - TEAM Chemical Engineering</option>
+                        <option value="TEAM Electrical Engineering">TEE - TEAM Electrical Engineering</option>
+                        <option value="Technical Entrepreneurship Management">TEM - Technical Entrepreneurship Management</option>
+                        <option value="TEAM Optics">TEO - TEAM Optics</option>
+                        <option value="TEAM Mechanical Engineering">TME - TEAM Mechanical Engineering</option>
+                        <option value="Religion &amp; Classics - Turkis">TUR - Religion &amp; Classics - Turkish</option>
+                        <option value="Women's Studies (see GSW for current courses)">WST - Women's Studies (see GSW for current courses)</option>
+                        <option value="Writing Program">WRT - Writing Program</option>
                       </Form.Control>
 
                 <div className="sliderbox">
@@ -181,25 +276,20 @@ class App extends Component {
 
                 <ButtonToolbar>
                   <ToggleButtonGroup type="checkbox" defaultValue={[1, 3]}>
-                    <ToggleButton value={'Mon'}>M</ToggleButton>
-                    <ToggleButton value={'Tues'}>T</ToggleButton>
-                    <ToggleButton value={'Wed'}>W</ToggleButton>
-                    <ToggleButton value={'Thurs'}>Th</ToggleButton>
-                    <ToggleButton value={'Fri'}>F</ToggleButton>
+                    <ToggleButton value={'MON'} onChange={(event) => this.ReMount('NONE', event.target.value)}>M</ToggleButton>
+                    <ToggleButton value={'TUE'} onChange={(event) => this.ReMount('NONE', event.target.value)}>T</ToggleButton>
+                    <ToggleButton value={'WEN'} onChange={(event) => this.ReMount('NONE', event.target.value)}>W</ToggleButton>
+                    <ToggleButton value={'THU'} onChange={(event) => this.ReMount('NONE', event.target.value)}>Th</ToggleButton>
+                    <ToggleButton value={'FRI'} onChange={(event) => this.ReMount('NONE', event.target.value)}>F</ToggleButton>
                   </ToggleButtonGroup>
                 </ButtonToolbar>
 
-
-
                 </Form.Group>
                 
-
-
-
               </div>
             </Col>
-            <Col xs={12} md={7} lg={7}>
-              {this.state.rows}
+            <Col xs={12} md={7}>
+              {this.state.courses}
             </Col>
             <Col xs={0} md={2} lg={1}>
                 <OverlayTrigger trigger="click" placement="left" overlay={popover}>
@@ -217,8 +307,6 @@ class App extends Component {
           </Row>
         </div>
       </div>
-
-
     );
   }
 }
