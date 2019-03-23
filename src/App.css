@@ -44,22 +44,24 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
+
 }
 
-.btn-primary {
+.btn-primary, .btn-primary.focus {
   background-color: transparent;
   color: grey;
   border-color: transparent;
   font-family: "Open Sans",sans-serif;
   font-weight: bold;
   font-size: 2em;
+  box-shadow: none;
 }
 
-
-.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active{
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .btn-group{
   background-color: transparent !important;
   color: #91d5ff !important; 
   border-color: transparent !important;
+  box-shadow: none;
 }
 
 /*.ant-slider-track{
