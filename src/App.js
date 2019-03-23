@@ -73,30 +73,28 @@ class App extends Component {
     }
 
     console.log(subject);
-
-    const weekdays = this.state.weekdays
-    console.log(weekdays)
-    console.log(weekday)
-    if (weekdays.includes(weekday)){
-      var index = weekdays.indexOf(weekday)
-      const newdays = weekdays.slice(0, index).concat(weekdays.slice(index+1,weekdays.length))
-      console.log(newdays)
-      this.setState({
-        weekdays: newdays
-      })
-    }else{
-      let days = this.state.weekdays
-      days.push(weekday)
-      console.log(days)
-      this.setState({
-        weekdays: days
-      })
+    if (weekday != 'NONE'){
+      const weekdays = this.state.weekdays
+      if (weekdays.includes(weekday)){
+        var index = weekdays.indexOf(weekday)
+        const newdays = weekdays.slice(0, index).concat(weekdays.slice(index+1,weekdays.length))
+        this.setState({
+          weekdays: newdays
+        })
+      }else{
+        let days = this.state.weekdays
+        days.push(weekday)
+        this.setState({
+          weekdays: days
+        })
+      }
     }
 
     try{
       var courseRows = []
-      let query = 'credit=4&major=' + subject + '&semester=Fall%202019'
+      let query = 'credit=4&major=' + encodeURIComponent(subject) + '&semester=Fall%202019'
       const weekdays = this.state.weekdays
+      console.log(weekdays)
       weekdays.forEach((day)=>{
         query = query + '&weekdays=' + day
       })
@@ -178,7 +176,7 @@ render(){
                 </Form.Group>
 
                 <Form.Group as={Col} className="formGroup" controlId="formGridDept">
-                    <Form.Control as="select" className="formControl" onChange={(event) => this.ReMount(event.target.value)}>
+                    <Form.Control as="select" className="formControl" onChange={(event) => this.ReMount(event.target.value,"NONE")}>
                         <option hidden>Department</option>
                         <option value="African &amp; African-American Studies">AAS - African &amp; African-American Studies</option>
                         <option value="Art &amp; Art History-Art History">AH - Art &amp; Art History-Art History</option>
