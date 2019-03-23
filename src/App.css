@@ -31,4 +31,21 @@
    color: gray;
 }
 
+.slider {
+  margin: 2em 0em 2em 0.5em;
+}
+
+.ant-slider-track{
+  background-color: red;
+}
+
+.ant-slider-handle, .ant-slider-dot-active{
+  border-color: red;
+  background-color: red;
+}
+
+.ant-slider:hover{
+  color: red;
+}
+
 
