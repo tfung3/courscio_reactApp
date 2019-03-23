@@ -11,12 +11,6 @@ class App extends Component {
       {id: 1, title: "Heat", overview:"bullshit"},
     ] 
 
-    this.state = {rows: [
-      <p key="0">This is my row0</p>,
-      <p key="1">This is my row1</p>,
-      <p key="2">This is my row2</p>,
-    ]} 
-
     var courseRows = []
     course.forEach((course) => {
       console.log(course.title)
@@ -41,29 +35,34 @@ class App extends Component {
     return (
       <div className="App">
         <div Container>
+
           <Row>
-            <Col className="filterLarge" xs={12} md={3}>
+            <Col className="filterLarge" xs={0} md={0} lg={1}>
+            </Col>
+            <Col className="filterLarge" xs={12} md={3} lg={2}>
               <div container className="filtersmall">
 
-                <Form.Group as={Col}  controlId="formGridTerm">
-                  <Form.Label>Term</Form.Label>
-                  <Form.Control as="select">
+                <p id="filterWord">FILTER BY</p>
+
+                <Form.Group as={Col} className="formGroup" controlId="formGridTerm">
+                  <Form.Control as="select" className="formControl">
+                    <option hidden>Term</option>
                     <option></option>
                     <option>Fall 2019</option>
                   </Form.Control>
                 </Form.Group>
 
-                <Form.Group as={Col} controlId="formGridSchool">
-                  <Form.Label>School</Form.Label>
-                  <Form.Control as="select">
+                <Form.Group as={Col} className="formGroup" controlId="formGridSchool">
+                  <Form.Control as="select" className="formControl">
+                    <option hidden>School</option>
                     <option></option>
                     <option>Arts, Science, and Engineering</option>
                   </Form.Control>
                 </Form.Group>
 
-                <Form.Group as={Col} controlId="formGridDept">
-                  <Form.Label>Departments</Form.Label>
-                  <Form.Control as="select">
+                <Form.Group as={Col} className="formGroup" controlId="formGridDept">
+                  <Form.Control as="select" className="formControl">
+                    <option hidden>Department</option>
                     <option></option>
                     <option value="AAS">AAS - African &amp; African-American Studies</option>
                     <option value="AH">AH - Art &amp; Art History-Art History</option>
@@ -158,11 +157,13 @@ class App extends Component {
                 </Form.Group>
               </div>
             </Col>
-            <Col xs={12} md={7}>
+            <Col xs={12} md={7} lg={6}>
               {this.state.rows}
             </Col>
-            <Col xs={0} md={2}>
+            <Col xs={0} md={2} lg={2}>
               xs=6 md=4
+            </Col>
+            <Col xs={0} md={0} lg={1}>
             </Col>
           </Row>
         </div>

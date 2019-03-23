@@ -12,6 +12,23 @@
   margin: 0px auto 2em auto ;
 }
 
-.Form.Label {
+.formGroup {
   text-align: left;
 }
+
+#filterWord {
+  font-family: "Helvetica Neue", Helvetica;
+  text-align: left;
+  padding: 0px 1em;
+  font-weight: 600;
+  color: #3f444c;
+}
+
+.formControl {
+   box-shadow: 2px 2px 3px lightgrey;
+   font-family: "Open Sans",sans-serif;
+   font-size: 0.9em;
+   color: gray;
+}
+
+
