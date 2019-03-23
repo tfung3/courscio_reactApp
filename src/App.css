@@ -31,11 +31,38 @@
    color: gray;
 }
 
-.slider {
-  margin: 2em 0em 2em 0.5em;
+.sliderbox {
+  margin: 3em 0em 3em 0.5em;
 }
 
-.ant-slider-track{
+.slider {
+  color: red;
+}
+
+.btn-group-toggle {
+  margin: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.btn-primary {
+  background-color: transparent;
+  color: grey;
+  border-color: transparent;
+  font-family: "Open Sans",sans-serif;
+  font-weight: bold;
+  font-size: 2em;
+}
+
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active{
+  background-color: transparent !important;
+  color: #91d5ff !important; 
+  border-color: transparent !important;
+}
+
+/*.ant-slider-track{
   background-color: red;
 }
 
@@ -44,8 +71,8 @@
   background-color: red;
 }
 
-.ant-slider:hover{
-  color: red;
-}
+.ant-slider-track.ant-slider-track-1:hover{
+  background-color: red;
+}*/
 
 

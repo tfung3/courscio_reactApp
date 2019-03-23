@@ -1,5 +1,6 @@
+
 import React, { Component } from 'react';
-import {Card, Container, Row, Col, Form} from 'react-bootstrap';
+import {Card, Container, Row, Col, Form, ButtonToolbar, ToggleButton, ToggleButtonGroup} from 'react-bootstrap';
 import {Slider, Switch, Icon} from 'antd';
 import './App.css';
 
@@ -32,8 +33,7 @@ class App extends Component {
 
 
   }
-  render() {
-
+  render(){ 
     const marks = {
       0: '8am',
       8.33: '',
@@ -168,11 +168,22 @@ class App extends Component {
                         <option value="WRT">WRT - Writing Program</option>
                       </Form.Control>
 
-                <div className="slider">
-
+                <div className="sliderbox">
                     <Slider range marks={marks} step={null} tooltipVisible={false} defaultValue={[0,38.45]} />
-
                 </div>
+
+                <ButtonToolbar>
+                  <ToggleButtonGroup type="checkbox" defaultValue={[1, 3]}>
+                    <ToggleButton value={'Mon'}>M</ToggleButton>
+                    <ToggleButton value={'Tues'}>T</ToggleButton>
+                    <ToggleButton value={'Wed'}>W</ToggleButton>
+                    <ToggleButton value={'Thurs'}>Th</ToggleButton>
+                    <ToggleButton value={'Fri'}>F</ToggleButton>
+                  </ToggleButtonGroup>
+                </ButtonToolbar>
+
+
+
                 </Form.Group>
                 
 
