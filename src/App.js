@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import {Card, Container, Row, Col, Form, ButtonToolbar, ToggleButton, ToggleButtonGroup} from 'react-bootstrap';
+import {Card, Container, Row, Col, Form, Button, ButtonToolbar, ToggleButton, ToggleButtonGroup, Popover, OverlayTrigger} from 'react-bootstrap';
 import {Slider, Switch, Icon} from 'antd';
 import './App.css';
 
@@ -49,6 +49,13 @@ class App extends Component {
       91.63: '',
       100: '8pm+'
     };
+
+    const popover = (
+                <Popover id="popover-basic" title="Popover right">
+                  And here's some <strong>amazing</strong> content. It's very engaging. right?
+                </Popover>
+              );
+
     return (
       <div className="App">
         <div Container>
@@ -56,7 +63,7 @@ class App extends Component {
           <Row>
             <Col className="filterLarge" xs={0} md={0} lg={1}>
             </Col>
-            <Col className="filterLarge" xs={12} md={3} lg={3}>
+            <Col className="filterLarge" xs={12} md={3} lg={2}>
               <div container className="filtersmall">
 
                 <p id="filterWord">FILTER BY</p>
@@ -191,11 +198,19 @@ class App extends Component {
 
               </div>
             </Col>
-            <Col xs={12} md={7} lg={6}>
+            <Col xs={12} md={7} lg={7}>
               {this.state.rows}
             </Col>
             <Col xs={0} md={2} lg={1}>
-              xs=6 md=4
+                <OverlayTrigger trigger="click" placement="left" overlay={popover}>
+                  <Button className="schedulePop" variant="success">Schedule</Button>
+                </OverlayTrigger>
+
+                <OverlayTrigger  trigger="click" placement="left" overlay={popover}>
+                  <Button className="dashPop" variant="success">Dashboard</Button>
+                </OverlayTrigger>
+              
+
             </Col>
             <Col xs={0} md={0} lg={1}>
             </Col>

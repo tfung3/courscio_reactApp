@@ -64,6 +64,14 @@
   box-shadow: none;
 }
 
+.schedulePop{
+  margin: 0em 0em 1em 0em;
+}
+
+.dashPop{
+  margin: 1em 0em 0em 0em;
+}
+
 /*.ant-slider-track{
   background-color: red;
 }
