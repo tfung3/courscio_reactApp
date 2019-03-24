@@ -39,7 +39,7 @@ class App extends Component {
       response.data.forEach((course) => {
         const courseRow = <Card className="classCard" bg="dark" text="white" key={course.key}>
             <Card.Body>
-              <Card.Title>{course.cname}</Card.Title>
+              <Card.Title>{course.name}</Card.Title>
               <Card.Text>
                 {course.title}
               </Card.Text>
@@ -164,6 +164,7 @@ render(){
                 <Form.Group as={Col} className="formGroup" controlId="formGridTerm">
                   <Form.Control as="select" className="formControl">
                     <option hidden>Term</option>
+                    <option></option>
                     <option>Fall 2019</option>
                   </Form.Control>
                 </Form.Group>
@@ -171,6 +172,7 @@ render(){
                 <Form.Group as={Col} className="formGroup" controlId="formGridSchool">
                   <Form.Control as="select" className="formControl">
                     <option hidden>School</option>
+                    <option></option>
                     <option>Arts, Science, and Engineering</option>
                   </Form.Control>
                 </Form.Group>
@@ -178,6 +180,7 @@ render(){
                 <Form.Group as={Col} className="formGroup" controlId="formGridDept">
                     <Form.Control as="select" className="formControl" onChange={(event) => this.ReMount(event.target.value,"NONE")}>
                         <option hidden>Department</option>
+                        <option></option>
                         <option value="African &amp; African-American Studies">AAS - African &amp; African-American Studies</option>
                         <option value="Art &amp; Art History-Art History">AH - Art &amp; Art History-Art History</option>
                         <option value="Anthropology">ANT - Anthropology</option>
@@ -266,13 +269,13 @@ render(){
                         <option value="Religion &amp; Classics - Turkis">TUR - Religion &amp; Classics - Turkish</option>
                         <option value="Women's Studies (see GSW for current courses)">WST - Women's Studies (see GSW for current courses)</option>
                         <option value="Writing Program">WRT - Writing Program</option>
-                      </Form.Control>
+                    </Form.Control>
 
                 <div className="sliderbox">
                     <Slider range marks={marks} step={null} tooltipVisible={false} defaultValue={[0,38.45]} />
                 </div>
 
-                <ButtonToolbar>
+                <ButtonToolbar xs={12} md={3} lg={2}>
                   <ToggleButtonGroup type="checkbox" defaultValue={[1, 3]}>
                     <ToggleButton value={'MON'} onChange={(event) => this.ReMount('NONE', event.target.value)}>M</ToggleButton>
                     <ToggleButton value={'TUE'} onChange={(event) => this.ReMount('NONE', event.target.value)}>T</ToggleButton>
@@ -286,16 +289,16 @@ render(){
                 
               </div>
             </Col>
-            <Col xs={12} md={7}>
+            <Col xs={12} md={7} lg={7}>
               {this.state.courses}
             </Col>
             <Col xs={0} md={2} lg={1}>
                 <OverlayTrigger trigger="click" placement="left" overlay={popover}>
-                  <Button className="schedulePop" variant="success">Schedule</Button>
+                  <Button className="schedulePop btn-info" variant="success">Schedule</Button>
                 </OverlayTrigger>
 
                 <OverlayTrigger  trigger="click" placement="left" overlay={popover}>
-                  <Button className="dashPop" variant="success">Dashboard</Button>
+                  <Button className="dashPop btn-info" variant="success">Dashboard</Button>
                 </OverlayTrigger>
               
 

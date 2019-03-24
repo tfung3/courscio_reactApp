@@ -8,12 +8,13 @@
 
 .classCard {
   
-  width: 90%;
-  margin: 0px auto 2em auto ;
+  width: 85%;
+  margin: 0px auto 2.5em 2.5em ;
 }
 
 .formGroup {
   text-align: left;
+  height: 3.5em;
 }
 
 #filterWord {
@@ -27,8 +28,14 @@
 .formControl {
    box-shadow: 2px 2px 3px lightgrey;
    font-family: "Open Sans",sans-serif;
-   font-size: 0.9em;
+   font-size: 1em;
    color: gray;
+   height: 3.5em;
+}
+
+option{
+  font-size: 1em;
+  box-shadow: transparent;
 }
 
 .sliderbox {
@@ -39,7 +46,7 @@
   color: red;
 }
 
-.btn-group-toggle {
+.btn-group-toggle, .btn-toolbar {
   margin: auto;
   display: flex;
   flex-direction: row;
@@ -47,14 +54,16 @@
 
 }
 
+
 .btn-primary, .btn-primary.focus {
   background-color: transparent;
   color: grey;
   border-color: transparent;
   font-family: "Open Sans",sans-serif;
   font-weight: bold;
-  font-size: 2em;
+  font-size: 160%;
   box-shadow: none;
+
 }
 
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .btn-group{
@@ -70,6 +79,14 @@
 
 .dashPop{
   margin: 1em 0em 0em 0em;
+}
+
+.schedulePop, .dashPop{
+    width: 6.5em;
+    background-color: #53afe8;
+    border-color: #53afe8;
+    box-shadow: 2px 4px 6px lightgray;
+
 }
 
 /*.ant-slider-track{

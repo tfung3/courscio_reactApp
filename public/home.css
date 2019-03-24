@@ -18,7 +18,7 @@
 }
 
 .navbar-nav.navbar-right li a {
-	font-size: 1.1em;
+	font-size: 1.2em;
     color: #3d3d3d ;
 }
 
@@ -28,6 +28,14 @@
 
 .navbar{
 	border-bottom: 1px solid lightgray ;
+}
+
+.navbar li a:hover {
+  	border-bottom: 1.3px solid gray;
+}
+
+.navbar li a.active {
+  border-bottom: 1.3px solid gray;
 }
 
 .btn-light {
