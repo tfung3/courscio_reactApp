@@ -16,15 +16,42 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
     <!--Navigation bar-->
-    <div id="nav-placeholder">
+    <nav class="row navbar navbar-expand-lg navbar-light">
+      <div class= "col-sm-0 col-md-0 col-lg-1"> 
+      </div>
+      
+      <a class="navbar-brand col-sm-1 col-md-1 col-lg-1" href="home.html">
+        <img class="image-fluid col-xs-1" id="logo" src="/Logo.png" alt="logo">
+      </a>
 
-    </div>
+       <div class="container order-xs-last" id="navcontainer">
+          <form class="input-group-btn form-inline col-md-12 w-100 col-lg-10 offset-lg-2">
+            <div class="input-group" id="searchbar">
+              <input class="form-control" type="text" placeholder="Search Course Name, Instructor, or Keywords..." aria-label="Search">
+              <div class="input-group-append">
+                <button class="btn btn-light" id="submit" type="submit">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
 
-    <script>
-      $(function(){
-        $("#nav-placeholder").load("nav.html");
-      });
-    </script>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse col-md-auto col-lg-4" id="navbarSupportedContent">
+        <ul class="navbar-nav navbar-right">
+          <li class="nav-item"><a href="home.html">Home</a></li>
+          <li class="nav-item"><a href="#">About us</a></li>
+          <li class="nav-item"><a href="#">Contact us</a></li>
+          <li class="nav-item"><a href="#">Sign up/Login</a></li>
+        </ul>
+      </div>
+      <div class= "col-xs-0 col-md-0 col-lg-1"> 
+      </div>
+    </nav>
     <!--end of Navigation bar-->
 
     <div id="root"></div>
