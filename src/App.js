@@ -154,7 +154,7 @@ render(){
       <div className="App">
         <div Container>
           <Row>
-            <Col className="filterLarge" xs={0} md={0} lg={1}>
+            <Col xs={0} md={0} lg={1}>
             </Col>
             <Col className="filterLarge" xs={12} md={3} lg={2}>
               <div container className="filtersmall">

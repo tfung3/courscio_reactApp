@@ -56,12 +56,12 @@ option{
 
 
 .btn-primary, .btn-primary.focus {
-  background-color: transparent;
-  color: grey;
-  border-color: transparent;
-  font-family: "Open Sans",sans-serif;
-  font-weight: bold;
-  font-size: 160%;
+  background-color: transparent !important;
+  color: grey !important;
+  border-color: transparent !important;
+  font-family: "Open Sans",sans-serif !important;
+  font-weight: bold !important;
+  font-size: 160% !important;
   box-shadow: none;
 
 }
