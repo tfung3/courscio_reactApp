@@ -103,16 +103,12 @@ p{
 	font-size: 16px;
 }
 
-.bannerCard {
-	margin-left: 1%;
-}
-
 .card {
 	border-color: transparent;
 }
 
 .card-title {
-	font-size: 28px;
+	font-size: 26px;
 	text-align: left;
 }
 

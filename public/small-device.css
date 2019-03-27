@@ -1,0 +1,12 @@
+@media only screen and (max-width:600px){
+
+	.btn-danger{
+		width: 100%;
+		height: auto;
+	}
+
+	.row {
+		width: 100%;
+		margin: 0px;
+	}
+}
