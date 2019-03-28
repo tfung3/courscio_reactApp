@@ -16,8 +16,10 @@ class App extends Component {
       courses: [],
       isLoading: false,
       err: false,
-      dept: "Computer Science",
+      dept: "Nothing",
       weekdays: [],
+      semester: "Fall 2019",
+      school: "Arts, Science, and Engineering",
     }
 
     this.ReMount = this.ReMount.bind(this)
@@ -32,22 +34,16 @@ class App extends Component {
 
     try{
       var courseRows = []
-      console.log("loop")
-      const response = await axios.get(API + DEFAULT_QUERY)
-      console.log("wait over")
-      console.log(response)
-      response.data.forEach((course) => {
-        const courseRow = <Card className="classCard" bg="dark" text="white" key={course.key}>
-            <Card.Body>
-              <Card.Title>{course.name}</Card.Title>
-              <Card.Text>
-                {course.title}
-              </Card.Text>
-            </Card.Body>
-            <br />
-          </Card>
-        courseRows.push(courseRow)
-      })
+      const courseRow = <Card className="classCard" bg="dark" text="white" key="0">
+          <Card.Body>
+            <Card.Title>You have not chose anything</Card.Title>
+            <Card.Text>
+              Use the filter or search box to find courses
+            </Card.Text>
+          </Card.Body>
+          <br />
+        </Card>
+      courseRows.push(courseRow)
       this.setState({
         courses: courseRows
       })
@@ -73,7 +69,7 @@ class App extends Component {
     }
 
     console.log(subject);
-    if (weekday != 'NONE'){
+    if (weekday !== 'NONE'){
       const weekdays = this.state.weekdays
       if (weekdays.includes(weekday)){
         var index = weekdays.indexOf(weekday)
@@ -92,7 +88,7 @@ class App extends Component {
 
     try{
       var courseRows = []
-      let query = 'credit=4&major=' + encodeURIComponent(subject) + '&semester=Fall%202019'
+      let query = 'major=' + encodeURIComponent(subject) + '&semester=' + encodeURIComponent(this.state.semester)
       const weekdays = this.state.weekdays
       console.log(weekdays)
       weekdays.forEach((day)=>{
@@ -102,26 +98,63 @@ class App extends Component {
       const response = await axios.get(API + query)
       console.log("wait over")
       console.log(response)
-      response.data.forEach((course) => {
-        const courseRow = <Card className="classCard" bg="dark" text="white">
+      var weekdayRow = ""
+      const filtered = response.data
+      for(var i= 0; i< filtered.length; i++) {
+        weekdayRow = "";
+        const cur_course = filtered[i];
+        while (i < filtered.length && cur_course.id == filtered[i].id){
+          weekdayRow = weekdayRow + " " + this.translate_weekday(filtered[i].weekday);
+          i++
+        }
+        i--
+        const courseRow = <Card className="classCard" bg="dark" text="white" key={cur_course.id}>
             <Card.Body>
-              <Card.Title>{course.cname}</Card.Title>
+              <Card.Title>{cur_course.cname}</Card.Title>
               <Card.Text>
-                {course.title}
+                {cur_course.title}
+              </Card.Text>
+              <Card.Text>
+                {weekdayRow}
               </Card.Text>
             </Card.Body>
             <br />
           </Card>
         courseRows.push(courseRow)
-      })
+      }
       this.setState({
         courses: courseRows
       })
     } catch {
+      console.log("ERROR")
       this.setState({
         err: true,
         isLoading: false
       })
+    }
+  }
+
+  translate_weekday(abbr){
+    if (abbr === "MON"){
+      return "Monday"
+    }
+    if(abbr === "TUE"){
+      return "Tuesday"
+    }
+    if(abbr === "WEN"){
+      return "Wednsday"
+    }
+    if(abbr === "THU"){
+      return "Thursday"
+    }
+    if(abbr === "FRI"){
+      return "Friday"
+    }
+    if(abbr === "SAT"){
+      return "Saturday"
+    }
+    if(abbr === "SUN"){
+      return "Sunday"
     }
   }
 
@@ -182,9 +215,9 @@ render(){
                         <option hidden>Department</option>
                         <option></option>
                         <option value="African &amp; African-American Studies">AAS - African &amp; African-American Studies</option>
-                        <option value="Art &amp; Art History-Art History">AH - Art &amp; Art History-Art History</option>
+                        <option value="Art &amp; Art History">AH - Art &amp; Art History</option>
                         <option value="Anthropology">ANT - Anthropology</option>
-                        <option value="Religion &amp; Classics - Arabic">ARA - Religion &amp; Classics - Arabic</option>
+                        <option value="Religion &amp; Classics  Arabic">ARA - Religion &amp; Classics - Arabic</option>
                         <option value="American Sign Language">ASL - American Sign Language</option>
                         <option value="Audio Music Engineering">AME - Audio Music Engineering</option>
                         <option value="American Studies">AMS - American Studies</option>
@@ -194,12 +227,12 @@ render(){
                         <option value="Biology">BIO - Biology</option>
                         <option value="Biomedical Engineering">BME - Biomedical Engineering</option>
                         <option value="College of Arts &amp; Science">CAS - College of Arts &amp; Science</option>
-                        <option value="Religion &amp; Classics - Classical Greek">CGR - Religion &amp; Classics - Classical Greek</option>
+                        <option value="Religion &amp; Classics  Classical Greek">CGR - Religion &amp; Classics - Classical Greek</option>
                         <option value="Chemical Engineering">CHE - Chemical Engineering</option>
-                        <option value="Modern Languages &amp; Cultures - Chinese">CHI - Modern Languages &amp; Cultures - Chinese</option>
+                        <option value="Modern Languages &amp; Cultures  Chinese">CHI - Modern Languages &amp; Cultures - Chinese</option>
                         <option value="Chemistry">CHM - Chemistry</option>
-                        <option value="Religion &amp; Classics - Classical Studies">CLA - Religion &amp; Classics - Classical Studies</option>
-                        <option value="Modern Languages &amp; Cultures - Comparative Literature">CLT - Modern Languages &amp; Cultures - Comparative Literature</option>
+                        <option value="Religion &amp; Classics  Classical Studies">CLA - Religion &amp; Classics - Classical Studies</option>
+                        <option value="Modern Languages &amp; Cultures  Comparative Literature">CLT - Modern Languages &amp; Cultures - Comparative Literature</option>
                         <option value="Computer Science">CSC - Computer Science</option>
                         <option value="Clinical and Social Sciences in Psychology">CSP - Clinical and Social Sciences in Psychology</option>
                         <option value="Center for Visual Science">CVS - Center for Visual Science</option>
@@ -216,20 +249,20 @@ render(){
                         <option value="English">ENG - English</option>
                         <option value="Alternative Energy">ERG - Alternative Energy</option>
                         <option value="Film and Media Studies">FMS - Film and Media Studies</option>
-                        <option value="Modern Languages &amp; Cultures - French">FR - Modern Languages &amp; Cultures - French</option>
-                        <option value="Modern Languages &amp; Cultures - German">GER - Modern Languages &amp; Cultures - German</option>
+                        <option value="Modern Languages &amp; Cultures  French">FR - Modern Languages &amp; Cultures - French</option>
+                        <option value="Modern Languages &amp; Cultures  German">GER - Modern Languages &amp; Cultures - German</option>
                         <option value="Gender, Sexuality &amp; Women's Studies">GSW - Gender, Sexuality &amp; Women's Studies</option>
-                        <option value="Religion &amp; Classics - Greek">GRK - Religion &amp; Classics - Greek</option>
-                        <option value="Religion &amp; Classics - Hebrew">HEB - Religion &amp; Classics - Hebrew</option>
+                        <option value="Religion &amp; Classics  Greek">GRK - Religion &amp; Classics - Greek</option>
+                        <option value="Religion &amp; Classics  Hebrew">HEB - Religion &amp; Classics - Hebrew</option>
                         <option value="History">HIS - History</option>
                         <option value="Health and Society">HLS - Health and Society</option>
                         <option value="Intensive English Program">IEP - Intensive English Program</option>
                         <option value="International Relations">IR - International Relations</option>
-                        <option value="Modern Languages &amp; Cultures - Italian">IT - Modern Languages &amp; Cultures - Italian</option>
-                        <option value="Modern Languages &amp; Cultures - Japanese">JPN - Modern Languages &amp; Cultures - Japanese</option>
+                        <option value="Modern Languages &amp; Cultures  Italian">IT - Modern Languages &amp; Cultures - Italian</option>
+                        <option value="Modern Languages &amp; Cultures  Japanese">JPN - Modern Languages &amp; Cultures - Japanese</option>
                         <option value="Judaic Studies">JST - Judaic Studies</option>
-                        <option value="Modern Languages &amp; Cultures - Korean">KOR - Modern Languages &amp; Cultures - Korean</option>
-                        <option value="Religion &amp; Classics - Latin">LAT - Religion &amp; Classics - Latin</option>
+                        <option value="Modern Languages &amp; Cultures  Korean">KOR - Modern Languages &amp; Cultures - Korean</option>
+                        <option value="Religion &amp; Classics  Latin">LAT - Religion &amp; Classics - Latin</option>
                         <option value="Linguistics">LIN - Linguistics</option>
                         <option value="Literary Translation Studies">LTS - Literary Translation Studies</option>
                         <option value="Mathematics">MTH - Mathematics</option>
@@ -244,21 +277,21 @@ render(){
                         <option value="Philosophy">PHL - Philosophy</option>
                         <option value="Photographic Preservation &amp; Collections Management">PPC - Photographic Preservation &amp; Collections Management</option>
                         <option value="Physics">PHY - Physics</option>
-                        <option value="Modern Languages &amp; Cultures - Polish">POL - Modern Languages &amp; Cultures - Polish</option>
-                        <option value="Modern Languages &amp; Cultures - Portuguese">POR - Modern Languages &amp; Cultures - Portuguese</option>
+                        <option value="Modern Languages &amp; Cultures  Polish">POL - Modern Languages &amp; Cultures - Polish</option>
+                        <option value="Modern Languages &amp; Cultures  Portuguese">POR - Modern Languages &amp; Cultures - Portuguese</option>
                         <option value="Political Science">PSC - Political Science</option>
-                        <option value="Psychology<">PSY - Psychology</option>
+                        <option value="Psychology">PSY - Psychology</option>
                         <option value="Religion and Classics">REL - Religion and Classics</option>
-                        <option value="Modern Languages &amp; Cultures - Russian Studies">RST - Modern Languages &amp; Cultures - Russian Studies</option>
-                        <option value="Modern Languages &amp; Cultures - Russian">RUS - Modern Languages &amp; Cultures - Russian</option>
-                        <option value="Art &amp; Art History-Studio Arts">SA - Art &amp; Art History-Studio Arts</option>
+                        <option value="Modern Languages &amp; Cultures  Russian Studies">RST - Modern Languages &amp; Cultures - Russian Studies</option>
+                        <option value="Modern Languages &amp; Cultures  Russian">RUS - Modern Languages &amp; Cultures - Russian</option>
+                        <option value="Art &amp; Art HistoryStudio Arts">SA - Art &amp; Art History-Studio Arts</option>
                         <option value="Study Abroad">SAB - Study Abroad</option>
                         <option value="Social Entrepreneurship">SEN - Social Entrepreneurship</option>
-                        <option value="Religion &amp; Classics - Sanskrit">SKT - Religion &amp; Classics - Sanskrit</option>
+                        <option value="Religion &amp; Classics  Sanskrit">SKT - Religion &amp; Classics - Sanskrit</option>
                         <option value="Sociology">SOC - Sociology</option>
-                        <option value="Modern Languages &amp; Cultures - Spanish">SP - Modern Languages &amp; Cultures - Spanish</option>
+                        <option value="Modern Languages &amp; Cultures  Spanish">SP - Modern Languages &amp; Cultures - Spanish</option>
                         <option value="Statistics">STT - Statistics</option>
-                        <option value="Sustainabilit">SUS - Sustainability</option>
+                        <option value="Sustainability">SUS - Sustainability</option>
                         <option value="TEAM Computer Science">TCS - TEAM Computer Science</option>
                         <option value="TEAM Biomedical Engineering">TEB - TEAM Biomedical Engineering</option>
                         <option value="TEAM Chemical Engineering">TEC - TEAM Chemical Engineering</option>
@@ -266,8 +299,8 @@ render(){
                         <option value="Technical Entrepreneurship Management">TEM - Technical Entrepreneurship Management</option>
                         <option value="TEAM Optics">TEO - TEAM Optics</option>
                         <option value="TEAM Mechanical Engineering">TME - TEAM Mechanical Engineering</option>
-                        <option value="Religion &amp; Classics - Turkis">TUR - Religion &amp; Classics - Turkish</option>
-                        <option value="Women's Studies (see GSW for current courses)">WST - Women's Studies (see GSW for current courses)</option>
+                        <option value="Religion &amp; Classics  Turkis">TUR - Religion &amp; Classics - Turkish</option>
+                        <option value="Gender, Sexuality &amp; Women's Studies">WST - Women's Studies (see GSW for current courses)</option>
                         <option value="Writing Program">WRT - Writing Program</option>
                     </Form.Control>
 
