@@ -10,6 +10,7 @@ const API = '/api/v1/course/filters?'
 class App extends Component {
 	constructor(props) {
 		super(props)
+
 		this.state = {
 			courses: [],
 			isLoading: false,
@@ -19,12 +20,14 @@ class App extends Component {
 			semester: "Fall 2019",
 			school: "Arts, Science, and Engineering",
 			courses_raw_data: [],
-			slider_val: [800,2400]
+			slider_val: [800,2400],
+			cur_course: -1
 		}
 
 		this.ReMount = this.ReMount.bind(this)
 		this.onSliderChange = this.onSliderChange.bind(this)
 		this.time_filter = this.time_filter.bind(this)
+		this.recordPopUpInfo = this.recordPopUpInfo.bind(this)
 	}
 
 	async componentDidMount() {
@@ -145,8 +148,8 @@ class App extends Component {
                   </tr>
               </tbody>
               </table>
-
             </div>
+            <button type="button" class="btn btn-info" data-toggle="modal" value={cur_course.id} data-target="#myModal" onClick={this.recordPopUpInfo}>Open Modal</button>
           </Card.Body>
           <br />
         </Card>
@@ -166,6 +169,13 @@ class App extends Component {
 				isLoading: false
 			})
 		}
+	}
+
+	recordPopUpInfo(e){
+		console.log(e.target.value)
+		this.setState({
+			cur_course: e.target.value
+		})
 	}
 
 	onSliderChange(value){
@@ -257,7 +267,7 @@ render(){
 							);
 		return (
 			<div className="App">
-				<div container="true">
+				<div className="Container">
 					<Row>
 						<Col xs={0} md={0} lg={1}>
 						</Col>
@@ -411,6 +421,19 @@ render(){
 						<Col xs={0} md={0} lg={1}>
 						</Col>
 					</Row>
+
+				<div class="modal fade" id="myModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			    <div class="modal-dialog">
+			        <div class="modal-content">
+			            <div class="modal-header">
+			                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			                <h4 class="modal-title" id="myModalLabel">{this.state.cur_course}</h4>
+			            </div>
+			            <div class="modal-body">Lorem Ipsum</div>
+			            
+			        </div>
+			    </div>
+			</div>
 				</div>
 			</div>
 		);

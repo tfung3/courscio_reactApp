@@ -2,8 +2,13 @@
 
 .App {
   text-align: center;
+  min-height: 100%;
   margin-top: 3%;
 
+}
+
+@media (min-width: 360px) {
+  .modal-dialog { max-width: none; }
 }
 
 .classCard {
@@ -25,12 +30,26 @@
   color: #3f444c;
 }
 
+
+
 .formControl {
    box-shadow: 2px 2px 3px lightgrey;
    font-family: "Open Sans",sans-serif;
    font-size: 1em;
    color: gray;
    height: 3.5em;
+}
+.modal-dialog {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.modal-content {
+  height: auto;
+  min-height: 100%;
+  border-radius: 0;
 }
 
 option{

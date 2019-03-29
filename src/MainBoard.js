@@ -104,7 +104,7 @@ class MainBoard extends Component{
 				<div className= "col-xs-0 col-md-0 col-lg-1"></div>
 			</nav>  
 
-			<div id="root"></div>
+			<div id="root" className="fullroot"></div>
 			<App courses = {this.state.courses}/>
 			</div>
 
