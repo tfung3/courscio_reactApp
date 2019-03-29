@@ -16,6 +16,7 @@ class Search extends Component{
 		if (search_value === ""){
 			search_value = "NONE";
 		}
+		document.getElementById('input_value').value = "";
 		console.log(search_value)
 		this.setState({
 			search_val: search_value

@@ -19,7 +19,7 @@ class App extends Component {
 			semester: "Fall 2019",
 			school: "Arts, Science, and Engineering",
 			courses_raw_data: [],
-			slider_val: [800,2000]
+			slider_val: [800,2400]
 		}
 
 		this.ReMount = this.ReMount.bind(this)
@@ -48,7 +48,7 @@ class App extends Component {
 					<br />
 				</Card>
 			courseRows.push(courseRow)
-			courseRows_raw.push([courseRow],800,2000)
+			courseRows_raw.push([courseRow],800,2400)
 			this.setState({
 				courses: courseRows,
 				courses_raw_data: courseRows_raw
@@ -182,6 +182,9 @@ class App extends Component {
 			b = (8+Math.floor(b/60))*100 + (b%60)
 		}else{
 			b = (8+Math.floor(b/60))*100 + (b%60) + 41
+		}
+		if (b === 2000){
+			b = 2400
 		}
 		console.log('onAfterChange: ', a, b);
 		this.state.slider_val = [a,b]
