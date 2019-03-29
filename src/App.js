@@ -10,9 +10,9 @@ const API = '/api/v1/course/filters?'
 class App extends Component {
 	constructor(props) {
 		super(props)
-
+		console.log(this.props.courses)
 		this.state = {
-			courses: [],
+			courses: this.props.courses,
 			isLoading: false,
 			err: false,
 			dept: "Nothing",
@@ -28,9 +28,9 @@ class App extends Component {
 		this.setState({
 			isLoading: true
 		});
-		
 
 		console.log("TO ROWS")
+		
 
 		try{
 			var courseRows = []
@@ -55,11 +55,18 @@ class App extends Component {
 		}
 	}
 
+	componentWillReceiveProps(nextProps){
+		this.setState({
+			courses: nextProps.courses
+		})
+	}
+
 	async ReMount(subject, weekday){
 		this.setState({
 			isLoading: true,
 			courses:[]
 		});
+
 		if (subject === 'NONE'){
 			subject = this.state.dept
 		}else{
@@ -112,7 +119,7 @@ class App extends Component {
           <Card.Body>
             <Card.Title>{cur_course.cname}&nbsp;&nbsp;{cur_course.title}</Card.Title>
             <Card.Subtitle className="text-muted">CRN&nbsp;{cur_course.crn}&nbsp;&nbsp;Credit:&nbsp;{cur_course.credit}</Card.Subtitle>
-            <Card.Text>
+            <div className="card-text">
               <table>
               <tbody>      
                   <tr>       
@@ -128,7 +135,7 @@ class App extends Component {
               </tbody>
               </table>
 
-            </Card.Text>
+            </div>
           </Card.Body>
           <br />
         </Card>
