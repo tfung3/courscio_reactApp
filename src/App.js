@@ -10,18 +10,21 @@ const API = '/api/v1/course/filters?'
 class App extends Component {
 	constructor(props) {
 		super(props)
-		console.log(this.props.courses)
 		this.state = {
-			courses: this.props.courses,
+			courses: [],
 			isLoading: false,
 			err: false,
 			dept: "Nothing",
 			weekdays: [],
 			semester: "Fall 2019",
 			school: "Arts, Science, and Engineering",
+			courses_raw_data: [],
+			slider_val: [800,2000]
 		}
 
 		this.ReMount = this.ReMount.bind(this)
+		this.onSliderChange = this.onSliderChange.bind(this)
+		this.time_filter = this.time_filter.bind(this)
 	}
 
 	async componentDidMount() {
@@ -34,6 +37,7 @@ class App extends Component {
 
 		try{
 			var courseRows = []
+			var courseRows_raw = []
 			const courseRow = <Card className="classCard" bg="dark" text="white" key="0">
 					<Card.Body>
 						<Card.Title>You have not chose anything</Card.Title>
@@ -44,8 +48,10 @@ class App extends Component {
 					<br />
 				</Card>
 			courseRows.push(courseRow)
+			courseRows_raw.push([courseRow],800,2000)
 			this.setState({
-				courses: courseRows
+				courses: courseRows,
+				courses_raw_data: courseRows_raw
 			})
 		} catch {
 			this.setState({
@@ -57,14 +63,15 @@ class App extends Component {
 
 	componentWillReceiveProps(nextProps){
 		this.setState({
-			courses: nextProps.courses
+			courses: nextProps.courses,
 		})
 	}
 
 	async ReMount(subject, weekday){
 		this.setState({
 			isLoading: true,
-			courses:[]
+			courses:[],
+			courses_raw_data: [],
 		});
 
 		if (subject === 'NONE'){
@@ -74,6 +81,10 @@ class App extends Component {
 				dept: subject
 			})
 		}
+
+		//The start_t and end_t
+		const a = this.state.slider_val[0]
+		const b = this.state.slider_val[1]
 
 		console.log(subject);
 		if (weekday !== 'NONE'){
@@ -94,7 +105,7 @@ class App extends Component {
 		}
 
 		try{
-			var courseRows = []
+			var courseRows_raw = []
 			let query = 'major=' + encodeURIComponent(subject) + '&semester=' + encodeURIComponent(this.state.semester)
 			const weekdays = this.state.weekdays
 			console.log(weekdays)
@@ -139,10 +150,14 @@ class App extends Component {
           </Card.Body>
           <br />
         </Card>
-				courseRows.push(courseRow)
+				courseRows_raw.push([courseRow,cur_course.start_t,cur_course.end_t])
 			}
+			var courseRows = this.time_filter(courseRows_raw, a, b)
+			console.log(courseRows)
 			this.setState({
-				courses: courseRows
+				courses: courseRows,
+				courses_raw_data: courseRows_raw
+				//save raw_data as 3-tuple including elem, start_t, end_t
 			})
 		} catch {
 			console.log("ERROR")
@@ -152,6 +167,41 @@ class App extends Component {
 			})
 		}
 	}
+
+	onSliderChange(value){
+		var a = parseFloat(value[0])
+		var b = parseFloat(value[1])
+		a = parseInt(a/100.0 * 720.0)
+		b = parseInt(b/100.0 * 720.0)
+		if (a%60 !== 59){
+			a = (8+Math.floor(a/60))*100 + (a%60)
+		}else{
+			a = (8+Math.floor(a/60))*100 + (a%60) + 41
+		}
+		if (b%60 !== 59){
+			b = (8+Math.floor(b/60))*100 + (b%60)
+		}else{
+			b = (8+Math.floor(b/60))*100 + (b%60) + 41
+		}
+		console.log('onAfterChange: ', a, b);
+		this.state.slider_val = [a,b]
+		const courses = this.time_filter(this.state.courses_raw_data, a, b)
+		console.log()
+		this.setState({
+			courses: courses
+		})
+	}
+
+	time_filter(tuples,a,b){
+		var courseRows = []
+		for (var i=0; i< tuples.length; i++){
+			if (tuples[i][1] >= a && tuples[i][2] <= b){
+				courseRows.push(tuples[i][0])
+			}
+		}
+		return courseRows
+	}
+
 
 	translate_weekday(abbr){
 		if (abbr === "MON"){
@@ -185,13 +235,13 @@ render(){
 			0: '8am',
 			8.33: '',
 			16.66: '',
-			25: '11am',
-			33.32: '',
+			25: '',
+			33.32: 'Noon',
 			41.65: '',
-			50: '2pm',
+			50: '',
 			58.31: '',
-			66.64: '',
-			74.97: '5pm',
+			66.64: '4pm',
+			74.97: '',
 			83.3: '',
 			91.63: '',
 			100: '8pm+'
@@ -324,7 +374,7 @@ render(){
 										</Form.Control>
 
 								<div className="sliderbox">
-										<Slider range marks={marks} step={null} tooltipVisible={false} defaultValue={[0,38.45]} />
+										<Slider range marks={marks} step={null} tooltipVisible={false} defaultValue={[0,100]} onAfterChange={this.onSliderChange}/>
 								</div>
 
 								<ButtonToolbar xs={12} md={3} lg={2}>

@@ -98,7 +98,7 @@ class MainBoard extends Component{
 						<li className="nav-item"><a href="home.html">Home</a></li>
 						<li className="nav-item"><a href="home.html">About us</a></li>
 						<li className="nav-item"><a href="google_api_test.html">Contact us</a></li>
-						<li className="nav-item"><a href="home.html">Sign up/Login</a></li>
+						<li className="nav-item"><a href="home.html">Sign up / Sign in</a></li>
 					</ul>
 				</div>
 				<div className= "col-xs-0 col-md-0 col-lg-1"></div>
