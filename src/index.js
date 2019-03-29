@@ -1,12 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
-import Search from './Search';
+import MainBoard from './MainBoard';
 import * as serviceWorker from './serviceWorker';
 
-ReactDOM.render(<Search />, document.getElementById('navcontainer'))
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<MainBoard />, document.getElementById("Board_Anchor"))
+
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

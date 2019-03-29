@@ -64,6 +64,7 @@ nav {
 	border-bottom: 1px solid lightgray ;
 }
 
+
 .btn-light {
 	background-color: transparent !important;
 	border-color: #ced4da;
@@ -103,6 +104,10 @@ p{
 	font-size: 16px;
 }
 
+#bannerCard {
+	margin-left: 0px;
+	margin-right: 0px;
+}
 .card {
 	border-color: transparent;
 }
@@ -117,7 +122,7 @@ p{
 }
 
 .card-img-top {
-	width: 100%;
+	width: 110%;
 	height: auto;
 }
 

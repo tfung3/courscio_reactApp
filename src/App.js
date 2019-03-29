@@ -108,18 +108,30 @@ class App extends Component {
 					i++
 				}
 				i--
-				const courseRow = <Card className="classCard" bg="dark" text="white" key={cur_course.id}>
-						<Card.Body>
-							<Card.Title>{cur_course.cname}</Card.Title>
-							<Card.Text>
-								{cur_course.title}
-							</Card.Text>
-							<Card.Text>
-								{weekdayRow}
-							</Card.Text>
-						</Card.Body>
-						<br />
-					</Card>
+				const courseRow = <Card className="classCard" bg="light" text="#383838" key={cur_course.key}>
+          <Card.Body>
+            <Card.Title>{cur_course.cname}&nbsp;&nbsp;{cur_course.title}</Card.Title>
+            <Card.Subtitle className="text-muted">CRN&nbsp;{cur_course.crn}&nbsp;&nbsp;Credit:&nbsp;{cur_course.credit}</Card.Subtitle>
+            <Card.Text>
+              <table>
+              <tbody>      
+                  <tr>       
+                    <td className="rowTitle">Description:</td>
+                    <td>{cur_course.description}</td>
+                  </tr>
+                  <tr>
+                   <td className="rowTitle">Time:</td>
+                    <td className="trim-text">{cur_course.weekday}&nbsp;{cur_course.start_t}-{cur_course.end_t}</td>
+                    <td className="rowTitle">Location: </td>
+                    <td>{cur_course.location}</td>
+                  </tr>
+              </tbody>
+              </table>
+
+            </Card.Text>
+          </Card.Body>
+          <br />
+        </Card>
 				courseRows.push(courseRow)
 			}
 			this.setState({
