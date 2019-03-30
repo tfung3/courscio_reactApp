@@ -12,13 +12,25 @@
 
 .classCard {
   
-  width: 85%;
+  width: auto;
   margin: 0px auto 2.5em 2.5em ;
 }
 
 .formGroup {
   text-align: left;
   height: 3.5em;
+}
+
+.portrait {
+  margin: 2em 2em 2em 2em ;
+}
+
+.elem_margin {
+  margin: 0.5em 0.5em 0.5em 0.5em ;
+}
+
+.textmid {
+  text-align: middle;
 }
 
 #filterWord {
@@ -266,6 +278,7 @@ table {
 
 .panel-body {
   margin-left: 50px;
+  width: 100%;
 }
 
 .btn-info {

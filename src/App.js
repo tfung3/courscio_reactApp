@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import {Card, Container, Row, Collapse, Col, Form, Button, ButtonToolbar, ToggleButton, ToggleButtonGroup, Popover, OverlayTrigger} from 'react-bootstrap';
+import {Card, Container, Modal, Row, Collapse, Col, Form, Button, ButtonToolbar, ToggleButton, ToggleButtonGroup, Popover, OverlayTrigger} from 'react-bootstrap';
 import {Slider, Switch, Rate, Icon} from 'antd';
 import axios from 'axios';
 import './App.css';
@@ -21,13 +21,18 @@ class App extends Component {
 			school: "Arts, Science, and Engineering",
 			courses_raw_data: [],
 			slider_val: [800,2400],
-			cur_course: -1
+			cur_course: -1,
+			show: false,
 		}
 
 		this.ReMount = this.ReMount.bind(this)
 		this.onSliderChange = this.onSliderChange.bind(this)
 		this.time_filter = this.time_filter.bind(this)
 		this.recordPopUpInfo = this.recordPopUpInfo.bind(this)
+		this.handleShow = this.handleShow.bind(this);
+    	this.handleClose = this.handleClose.bind(this);
+
+
 	}
 
 	async componentDidMount() {
@@ -132,7 +137,7 @@ class App extends Component {
 				const courseRow = <Card className="classCard" bg="light" text="#383838" key={cur_course.key}>
           <Card.Body>
           <Row>
-	          <Col xs={9} id="courseInfo">
+	          <Col tag="a" onClick={this.handleShow} style={{ cursor: "pointer"}} xs={9} id="courseInfo">
 	            <Card.Title>{cur_course.cname}&nbsp;&nbsp;{cur_course.title}</Card.Title>
 	            <Card.Subtitle>CRN&nbsp;{cur_course.crn}&nbsp;&nbsp;{cur_course.credit}&nbsp;Credits</Card.Subtitle>
 	            <div className="card-text">
@@ -168,7 +173,6 @@ class App extends Component {
 		           	</div>
 	            </Col>
             </Row>
-            <button type="button" class="btn btn-info" data-toggle="modal" value={cur_course.id} data-target="#myModal" onClick={this.recordPopUpInfo}>Open Modal</button>
           </Card.Body>
           <br />
         </Card>
@@ -257,6 +261,15 @@ class App extends Component {
 		if(abbr === "SUN"){
 			return "SUN"
 		}
+	}
+
+	handleClose() {
+	  this.setState({ show: false });
+	}
+
+
+	handleShow() {
+	  this.setState({ show: true });
 	}
 
 
@@ -444,9 +457,7 @@ render(){
 						</Col>
 					</Row>
 
-				<div class="modal fade" id="myModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-			    <div class="modal-dialog">
-			        <div class="modal-content">
+					<Modal show={this.state.show} onHide={this.handleClose}>
 			            <div class="modal-header">
 			                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 			                <h4 class="modal-title" id="myModalLabel">{this.state.cur_course}</h4>
@@ -488,14 +499,14 @@ render(){
 	            			  		           	<div id="flag">
 	            			  		           		<span id="flagtext">Course Rating</span> <br /><p id="courseScore">5</p>
 	            			  		           	</div>
-	            			  		           	<Rate allowHalf defaultValue={2.5} />
+	            			  		           	<Rate allowHalf defaultValue={2.5}/>
 	            			  	            </Col>
 	            			            </Row>
 	            			            <Row>
 	            			              	<div className="cardButtonMod">
-	            			  		           	<Button id="selectMod" variant="success">Add to Schedule</Button>
-	            			  		           	<Button id="wishlistMod" variant="danger">Add to Wishlist</Button>
-	            			  		           	<Button id="syllabusMod" variant="secondary">Syllabus</Button>
+	            			  		           	<Button id="selectMod"  variant="success">Add to Schedule</Button>
+	            			  		           	<Button id="wishlistMod"  variant="danger">Add to Wishlist</Button>
+	            			  		           	<Button id="syllabusMod"  variant="secondary">Syllabus</Button>
 	            			  		        </div>
 	            			            </Row>
             			            </Card.Body>
@@ -567,10 +578,10 @@ render(){
        
 
 		            			</Col>
-			            		<Col xs={3}>
+			            		<Col xs={4}>
 			                       <div class="card">
 			                           <div class="card-body text-center pb-2">
-			                               <p><img class="rounded-circle" src="http://nicesnippets.com/demo/profile-2.png" width="100%" height="auto" /></p>
+			                               <p><img class="rounded-circle portrait" src="http://nicesnippets.com/demo/profile-2.png" width="100%" height="auto" /></p>
 			                               <h5 class="profCard-title"><strong>Nike Tyson</strong></h5>
 			                               <p class="profCard-text">This is basic user profile with image, title, detail and button.</p>
 			                           </div>
@@ -579,10 +590,8 @@ render(){
 			            	</Row>
 			            </div>
 			            
-			        </div>
+			        </Modal>
 			    </div>
-			</div>
-				</div>
 			</div>
 		);
 	}
