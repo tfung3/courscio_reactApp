@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import {Card, Container, Row, Collapse, Col, Form, Button, ButtonToolbar, ToggleButton, ToggleButtonGroup, Popover, OverlayTrigger} from 'react-bootstrap';
-import {Slider, Switch, Icon} from 'antd';
+import {Slider, Switch, Rate, Icon} from 'antd';
 import axios from 'axios';
 import './App.css';
 
@@ -132,45 +132,42 @@ class App extends Component {
 				const courseRow = <Card className="classCard" bg="light" text="#383838" key={cur_course.key}>
           <Card.Body>
           <Row>
-          <Col xs={10}>
-            <Card.Title>{cur_course.cname}&nbsp;&nbsp;{cur_course.title}</Card.Title>
-            <Card.Subtitle>CRN&nbsp;{cur_course.crn}&nbsp;&nbsp;Credit:&nbsp;{cur_course.credit}</Card.Subtitle>
-            <Card.Text>
-              <table>
-              	<tbody>     
-	          		<tr>
-	          		 <td className="rowTitle">Time:</td>
-	          		  <td id="time" width="30%">{cur_course.weekday}&nbsp;{cur_course.start_t}-{cur_course.end_t}</td>
-	          		  <td className="rowTitle" id="location">Location: </td>
-	          		  <td>{cur_course.location}</td>
-	          		</tr>
-	          		<tr>
-	          		 <td className="rowTitle">Instructor:</td>
-	          		 <td id="instructor">{cur_course.instructor}</td>
-	          		</tr> 
-	          	</tbody>
-	          </table>
-	          <table>
-	          	<tbody>
-	              <tr>       
-	                <td className="rowTitle">Description:</td>
-	                <td>{cur_course.description}</td>
-	              </tr>
-              </tbody>
-              </table>
-            </Card.Text>
-           </Col>
-           <Col xs={2}>
-           	<div id="flag">
-           		{cur_course.score} <br />
-
-           	</div>
-           </Col>
+	          <Col xs={9} id="courseInfo">
+	            <Card.Title>{cur_course.cname}&nbsp;&nbsp;{cur_course.title}</Card.Title>
+	            <Card.Subtitle>CRN&nbsp;{cur_course.crn}&nbsp;&nbsp;{cur_course.credit}&nbsp;Credits</Card.Subtitle>
+	            <div className="card-text">
+	              <table>
+	              	<tbody>     
+		          		<tr>
+		          		 	<td className="rowTitle">Time:</td>
+		          		    <td id="time">{weekdayRow}&nbsp;{cur_course.start_t}-{cur_course.end_t}</td>
+		          		</tr>
+		          		<tr>
+			          		<td className="rowTitle">Location: </td>
+			          		<td>{cur_course.location}</td>
+		          		</tr>
+		          		<tr>
+			          		<td className="rowTitle">Instructor:</td>
+			          		<td id="instructor">{cur_course.instructor}</td>
+		          		</tr>
+		              	<tr>       
+			                <td className="rowTitle">Description:</td>
+			                <td>{cur_course.description}</td>
+		              </tr>
+	              </tbody>
+	              </table>
+	            </div>
+	            </Col>
+	            <Col xs={3} id="flagdiv">
+		           	<div id="flag">
+		           		<span id="flagtext">Course Rating</span> <br /><p id="courseScore">{cur_course.score}</p>
+		           	</div>
+		           	<div className="cardButton">
+		           	  <Button id="select" variant="success">Add to Schedule</Button>
+		           	  <Button id="wishlist" variant="danger">Add to Wishlist</Button>
+		           	</div>
+	            </Col>
             </Row>
-            <div className="cardButton">
-              <Button id="select" variant="success">Select</Button>
-              <Button id="wishlist" variant="danger">Add to wishlist</Button>
-            </div>
             <button type="button" class="btn btn-info" data-toggle="modal" value={cur_course.id} data-target="#myModal" onClick={this.recordPopUpInfo}>Open Modal</button>
           </Card.Body>
           <br />
@@ -240,25 +237,25 @@ class App extends Component {
 
 	translate_weekday(abbr){
 		if (abbr === "MON"){
-			return "Monday"
+			return "M"
 		}
 		if(abbr === "TUE"){
-			return "Tuesday"
+			return "T"
 		}
 		if(abbr === "WEN"){
-			return "Wednsday"
+			return "W"
 		}
 		if(abbr === "THU"){
-			return "Thursday"
+			return "TH"
 		}
 		if(abbr === "FRI"){
-			return "Friday"
+			return "F"
 		}
 		if(abbr === "SAT"){
-			return "Saturday"
+			return "SAT"
 		}
 		if(abbr === "SUN"){
-			return "Sunday"
+			return "SUN"
 		}
 	}
 
@@ -287,6 +284,7 @@ render(){
 									And here's some <strong>amazing</strong> content. It's very engaging. right?
 								</Popover>
 							);
+
 
 		return (
 
@@ -317,98 +315,98 @@ render(){
 								</Form.Group>
 
 								<Form.Group as={Col} className="formGroup" controlId="formGridDept">
-										<Form.Control as="select" className="formControl" onChange={(event) => this.ReMount(event.target.value,"NONE")}>
-												<option hidden>Department</option>
-												<option></option>
-												<option value="African &amp; African-American Studies">AAS - African &amp; African-American Studies</option>
-												<option value="Art &amp; Art History">AH - Art &amp; Art History</option>
-												<option value="Anthropology">ANT - Anthropology</option>
-												<option value="Religion &amp; Classics  Arabic">ARA - Religion &amp; Classics - Arabic</option>
-												<option value="American Sign Language">ASL - American Sign Language</option>
-												<option value="Audio Music Engineering">AME - Audio Music Engineering</option>
-												<option value="American Studies">AMS - American Studies</option>
-												<option value="Astronomy">AST - Astronomy</option>
-												<option value="Archeology Tech &amp; Hist Structure">ATH - Archeology Tech &amp; Hist Structure</option>
-												<option value="Brain and Cognitive Sciences">BCS - Brain and Cognitive Sciences</option>
-												<option value="Biology">BIO - Biology</option>
-												<option value="Biomedical Engineering">BME - Biomedical Engineering</option>
-												<option value="College of Arts &amp; Science">CAS - College of Arts &amp; Science</option>
-												<option value="Religion &amp; Classics  Classical Greek">CGR - Religion &amp; Classics - Classical Greek</option>
-												<option value="Chemical Engineering">CHE - Chemical Engineering</option>
-												<option value="Modern Languages &amp; Cultures  Chinese">CHI - Modern Languages &amp; Cultures - Chinese</option>
-												<option value="Chemistry">CHM - Chemistry</option>
-												<option value="Religion &amp; Classics  Classical Studies">CLA - Religion &amp; Classics - Classical Studies</option>
-												<option value="Modern Languages &amp; Cultures  Comparative Literature">CLT - Modern Languages &amp; Cultures - Comparative Literature</option>
-												<option value="Computer Science">CSC - Computer Science</option>
-												<option value="Clinical and Social Sciences in Psychology">CSP - Clinical and Social Sciences in Psychology</option>
-												<option value="Center for Visual Science">CVS - Center for Visual Science</option>
-												<option value="Dance">DAN - Dance</option>
-												<option value="Data Science &amp; Computation">DSC - Data Science &amp; Computation</option>
-												<option value="Digital Humanities">DH - Digital Humanities</option>
-												<option value="Digital Media Studies">DMS - Digital Media Studies</option>
-												<option value="Engineering and Applied Sciences">EAS - Engineering and Applied Sciences</option>
-												<option value="Electrical and Computer Engineering">ECE - Electrical and Computer Engineering</option>
-												<option value="Economics">ECO - Economics</option>
-												<option value="Earth &amp; Environmental Science">EES - Earth &amp; Environmental Science</option>
-												<option value="Environmental Humanities">EHU - Environmental Humanities</option>
-												<option value="English Language Program">ELP - English Language Program</option>
-												<option value="English">ENG - English</option>
-												<option value="Alternative Energy">ERG - Alternative Energy</option>
-												<option value="Film and Media Studies">FMS - Film and Media Studies</option>
-												<option value="Modern Languages &amp; Cultures  French">FR - Modern Languages &amp; Cultures - French</option>
-												<option value="Modern Languages &amp; Cultures  German">GER - Modern Languages &amp; Cultures - German</option>
-												<option value="Gender, Sexuality &amp; Women's Studies">GSW - Gender, Sexuality &amp; Women's Studies</option>
-												<option value="Religion &amp; Classics  Greek">GRK - Religion &amp; Classics - Greek</option>
-												<option value="Religion &amp; Classics  Hebrew">HEB - Religion &amp; Classics - Hebrew</option>
-												<option value="History">HIS - History</option>
-												<option value="Health and Society">HLS - Health and Society</option>
-												<option value="Intensive English Program">IEP - Intensive English Program</option>
-												<option value="International Relations">IR - International Relations</option>
-												<option value="Modern Languages &amp; Cultures  Italian">IT - Modern Languages &amp; Cultures - Italian</option>
-												<option value="Modern Languages &amp; Cultures  Japanese">JPN - Modern Languages &amp; Cultures - Japanese</option>
-												<option value="Judaic Studies">JST - Judaic Studies</option>
-												<option value="Modern Languages &amp; Cultures  Korean">KOR - Modern Languages &amp; Cultures - Korean</option>
-												<option value="Religion &amp; Classics  Latin">LAT - Religion &amp; Classics - Latin</option>
-												<option value="Linguistics">LIN - Linguistics</option>
-												<option value="Literary Translation Studies">LTS - Literary Translation Studies</option>
-												<option value="Mathematics">MTH - Mathematics</option>
-												<option value="Materials Science">MSC - Materials Science</option>
-												<option value="Mechanical Engineering">ME - Mechanical Engineering</option>
-												<option value="Music">MUR - Music</option>
-												<option value="Naval Science">NAV - Naval Science</option>
-												<option value="Neuroscience">NSC - Neuroscience</option>
-												<option value="Optics">OPT - Optics</option>
-												<option value="Wallis Institute of Political Economics">PEC - Wallis Institute of Political Economics</option>
-												<option value="Public Health">PH - Public Health</option>
-												<option value="Philosophy">PHL - Philosophy</option>
-												<option value="Photographic Preservation &amp; Collections Management">PPC - Photographic Preservation &amp; Collections Management</option>
-												<option value="Physics">PHY - Physics</option>
-												<option value="Modern Languages &amp; Cultures  Polish">POL - Modern Languages &amp; Cultures - Polish</option>
-												<option value="Modern Languages &amp; Cultures  Portuguese">POR - Modern Languages &amp; Cultures - Portuguese</option>
-												<option value="Political Science">PSC - Political Science</option>
-												<option value="Psychology">PSY - Psychology</option>
-												<option value="Religion and Classics">REL - Religion and Classics</option>
-												<option value="Modern Languages &amp; Cultures  Russian Studies">RST - Modern Languages &amp; Cultures - Russian Studies</option>
-												<option value="Modern Languages &amp; Cultures  Russian">RUS - Modern Languages &amp; Cultures - Russian</option>
-												<option value="Art &amp; Art HistoryStudio Arts">SA - Art &amp; Art History-Studio Arts</option>
-												<option value="Study Abroad">SAB - Study Abroad</option>
-												<option value="Social Entrepreneurship">SEN - Social Entrepreneurship</option>
-												<option value="Religion &amp; Classics  Sanskrit">SKT - Religion &amp; Classics - Sanskrit</option>
-												<option value="Sociology">SOC - Sociology</option>
-												<option value="Modern Languages &amp; Cultures  Spanish">SP - Modern Languages &amp; Cultures - Spanish</option>
-												<option value="Statistics">STT - Statistics</option>
-												<option value="Sustainability">SUS - Sustainability</option>
-												<option value="TEAM Computer Science">TCS - TEAM Computer Science</option>
-												<option value="TEAM Biomedical Engineering">TEB - TEAM Biomedical Engineering</option>
-												<option value="TEAM Chemical Engineering">TEC - TEAM Chemical Engineering</option>
-												<option value="TEAM Electrical Engineering">TEE - TEAM Electrical Engineering</option>
-												<option value="Technical Entrepreneurship Management">TEM - Technical Entrepreneurship Management</option>
-												<option value="TEAM Optics">TEO - TEAM Optics</option>
-												<option value="TEAM Mechanical Engineering">TME - TEAM Mechanical Engineering</option>
-												<option value="Religion &amp; Classics  Turkis">TUR - Religion &amp; Classics - Turkish</option>
-												<option value="Gender, Sexuality &amp; Women's Studies">WST - Women's Studies (see GSW for current courses)</option>
-												<option value="Writing Program">WRT - Writing Program</option>
-										</Form.Control>
+									<Form.Control as="select" className="formControl" onChange={(event) => this.ReMount(event.target.value,"NONE")}>
+										<option hidden>Department</option>
+										<option></option>
+										<option value="African &amp; African-American Studies">AAS - African &amp; African-American Studies</option>
+										<option value="Art &amp; Art History">AH - Art &amp; Art History</option>
+										<option value="Anthropology">ANT - Anthropology</option>
+										<option value="Religion &amp; Classics  Arabic">ARA - Religion &amp; Classics - Arabic</option>
+										<option value="American Sign Language">ASL - American Sign Language</option>
+										<option value="Audio Music Engineering">AME - Audio Music Engineering</option>
+										<option value="American Studies">AMS - American Studies</option>
+										<option value="Astronomy">AST - Astronomy</option>
+										<option value="Archeology Tech &amp; Hist Structure">ATH - Archeology Tech &amp; Hist Structure</option>
+										<option value="Brain and Cognitive Sciences">BCS - Brain and Cognitive Sciences</option>
+										<option value="Biology">BIO - Biology</option>
+										<option value="Biomedical Engineering">BME - Biomedical Engineering</option>
+										<option value="College of Arts &amp; Science">CAS - College of Arts &amp; Science</option>
+										<option value="Religion &amp; Classics  Classical Greek">CGR - Religion &amp; Classics - Classical Greek</option>
+										<option value="Chemical Engineering">CHE - Chemical Engineering</option>
+										<option value="Modern Languages &amp; Cultures  Chinese">CHI - Modern Languages &amp; Cultures - Chinese</option>
+										<option value="Chemistry">CHM - Chemistry</option>
+										<option value="Religion &amp; Classics  Classical Studies">CLA - Religion &amp; Classics - Classical Studies</option>
+										<option value="Modern Languages &amp; Cultures  Comparative Literature">CLT - Modern Languages &amp; Cultures - Comparative Literature</option>
+										<option value="Computer Science">CSC - Computer Science</option>
+										<option value="Clinical and Social Sciences in Psychology">CSP - Clinical and Social Sciences in Psychology</option>
+										<option value="Center for Visual Science">CVS - Center for Visual Science</option>
+										<option value="Dance">DAN - Dance</option>
+										<option value="Data Science &amp; Computation">DSC - Data Science &amp; Computation</option>
+										<option value="Digital Humanities">DH - Digital Humanities</option>
+										<option value="Digital Media Studies">DMS - Digital Media Studies</option>
+										<option value="Engineering and Applied Sciences">EAS - Engineering and Applied Sciences</option>
+										<option value="Electrical and Computer Engineering">ECE - Electrical and Computer Engineering</option>
+										<option value="Economics">ECO - Economics</option>
+										<option value="Earth &amp; Environmental Science">EES - Earth &amp; Environmental Science</option>
+										<option value="Environmental Humanities">EHU - Environmental Humanities</option>
+										<option value="English Language Program">ELP - English Language Program</option>
+										<option value="English">ENG - English</option>
+										<option value="Alternative Energy">ERG - Alternative Energy</option>
+										<option value="Film and Media Studies">FMS - Film and Media Studies</option>
+										<option value="Modern Languages &amp; Cultures  French">FR - Modern Languages &amp; Cultures - French</option>
+										<option value="Modern Languages &amp; Cultures  German">GER - Modern Languages &amp; Cultures - German</option>
+										<option value="Gender, Sexuality &amp; Women's Studies">GSW - Gender, Sexuality &amp; Women's Studies</option>
+										<option value="Religion &amp; Classics  Greek">GRK - Religion &amp; Classics - Greek</option>
+										<option value="Religion &amp; Classics  Hebrew">HEB - Religion &amp; Classics - Hebrew</option>
+										<option value="History">HIS - History</option>
+										<option value="Health and Society">HLS - Health and Society</option>
+										<option value="Intensive English Program">IEP - Intensive English Program</option>
+										<option value="International Relations">IR - International Relations</option>
+										<option value="Modern Languages &amp; Cultures  Italian">IT - Modern Languages &amp; Cultures - Italian</option>
+										<option value="Modern Languages &amp; Cultures  Japanese">JPN - Modern Languages &amp; Cultures - Japanese</option>
+										<option value="Judaic Studies">JST - Judaic Studies</option>
+										<option value="Modern Languages &amp; Cultures  Korean">KOR - Modern Languages &amp; Cultures - Korean</option>
+										<option value="Religion &amp; Classics  Latin">LAT - Religion &amp; Classics - Latin</option>
+										<option value="Linguistics">LIN - Linguistics</option>
+										<option value="Literary Translation Studies">LTS - Literary Translation Studies</option>
+										<option value="Mathematics">MTH - Mathematics</option>
+										<option value="Materials Science">MSC - Materials Science</option>
+										<option value="Mechanical Engineering">ME - Mechanical Engineering</option>
+										<option value="Music">MUR - Music</option>
+										<option value="Naval Science">NAV - Naval Science</option>
+										<option value="Neuroscience">NSC - Neuroscience</option>
+										<option value="Optics">OPT - Optics</option>
+										<option value="Wallis Institute of Political Economics">PEC - Wallis Institute of Political Economics</option>
+										<option value="Public Health">PH - Public Health</option>
+										<option value="Philosophy">PHL - Philosophy</option>
+										<option value="Photographic Preservation &amp; Collections Management">PPC - Photographic Preservation &amp; Collections Management</option>
+										<option value="Physics">PHY - Physics</option>
+										<option value="Modern Languages &amp; Cultures  Polish">POL - Modern Languages &amp; Cultures - Polish</option>
+										<option value="Modern Languages &amp; Cultures  Portuguese">POR - Modern Languages &amp; Cultures - Portuguese</option>
+										<option value="Political Science">PSC - Political Science</option>
+										<option value="Psychology">PSY - Psychology</option>
+										<option value="Religion and Classics">REL - Religion and Classics</option>
+										<option value="Modern Languages &amp; Cultures  Russian Studies">RST - Modern Languages &amp; Cultures - Russian Studies</option>
+										<option value="Modern Languages &amp; Cultures  Russian">RUS - Modern Languages &amp; Cultures - Russian</option>
+										<option value="Art &amp; Art HistoryStudio Arts">SA - Art &amp; Art History-Studio Arts</option>
+										<option value="Study Abroad">SAB - Study Abroad</option>
+										<option value="Social Entrepreneurship">SEN - Social Entrepreneurship</option>
+										<option value="Religion &amp; Classics  Sanskrit">SKT - Religion &amp; Classics - Sanskrit</option>
+										<option value="Sociology">SOC - Sociology</option>
+										<option value="Modern Languages &amp; Cultures  Spanish">SP - Modern Languages &amp; Cultures - Spanish</option>
+										<option value="Statistics">STT - Statistics</option>
+										<option value="Sustainability">SUS - Sustainability</option>
+										<option value="TEAM Computer Science">TCS - TEAM Computer Science</option>
+										<option value="TEAM Biomedical Engineering">TEB - TEAM Biomedical Engineering</option>
+										<option value="TEAM Chemical Engineering">TEC - TEAM Chemical Engineering</option>
+										<option value="TEAM Electrical Engineering">TEE - TEAM Electrical Engineering</option>
+										<option value="Technical Entrepreneurship Management">TEM - Technical Entrepreneurship Management</option>
+										<option value="TEAM Optics">TEO - TEAM Optics</option>
+										<option value="TEAM Mechanical Engineering">TME - TEAM Mechanical Engineering</option>
+										<option value="Religion &amp; Classics  Turkis">TUR - Religion &amp; Classics - Turkish</option>
+										<option value="Gender, Sexuality &amp; Women's Studies">WST - Women's Studies (see GSW for current courses)</option>
+										<option value="Writing Program">WRT - Writing Program</option>
+									</Form.Control>
 
 								<div className="sliderbox">
 										<Slider range marks={marks} step={null} tooltipVisible={false} defaultValue={[0,100]} onAfterChange={this.onSliderChange}/>
@@ -456,74 +454,127 @@ render(){
 			            <div class="modal-body">
 			            	<Row>
 			            		<Col xs={8}>
-		            			  <Card className="classCard" bg="light" text="#383838" key={this.state.cur_course.key}>
-	            			           <Card.Body>
-	            			           <Row>
-		            			           <Col xs={10}>
-		            			             <Card.Title>{this.state.cur_course}&nbsp;&nbsp;TITLE</Card.Title>
-		            			             <Card.Subtitle>CRN&nbsp;12345&nbsp;&nbsp;Credit:&nbsp;4.0</Card.Subtitle>
-		            			             <Card.Text>
-		            			               <table>
-		            			               	<tbody>      
-		            			                   <tr>       
-		            			                     <td className="rowTitle">Description:</td>
-		            			                     <td>Lorem Ipsum</td>
-		            			                   </tr>
-		            			                   <tr>
-		            			                    <td className="rowTitle">Time:</td>
-		            			                     <td id="time">Monday&nbsp;900-1015</td>
-		            			                   </tr>
-		            			                   <tr>
-		            			                     <td className="rowTitle" id="location">Location: </td>
-		            			                     <td>Wegmans 1101</td>
-		            			                   </tr>
-		            			                   <tr>
-		            			                    <td className="rowTitle">Instructor:</td>
-		            			                    <td id="instructor">Ferguson, George</td>
-		            			                   </tr>
-		            			               </tbody>
-		            			               </table>
-		            			             </Card.Text>
-		            			            </Col>
-		            			            <Col xs={2}>
-		            			            	<div id="flag">
-		            			            		10 <br />
+		            			  <Card className="classCard" bg="light" text="#383838">
+            			            <Card.Body>
+	            			            <Row>
+		            			  	        <Col xs={9} id="courseInfo">
+		            			  	            <Card.Title>CSC171&nbsp;&nbsp;Introduction of Computer</Card.Title>
+		            			  	            <Card.Subtitle>CRN&nbsp;12378&nbsp;&nbsp;4&nbsp;Credits</Card.Subtitle>
+		            			  	            <div className="card-text">
+		            			  	              	<table>
+		            			  	              		<tbody>     
+			            			  		          		<tr>
+			            			  		          		 	<td className="rowTitle">Time:</td>
+			            			  		          		    <td id="time">W 1230-1560</td>
+			            			  		          		</tr>
+			            			  		          		<tr>
+			            			  			          		<td className="rowTitle">Location: </td>
+			            			  			          		<td>Hutch</td>
+			            			  		          		</tr>
+			            			  		          		<tr>
+			            			  			          		<td className="rowTitle">Instructor:</td>
+			            			  			          		<td id="instructor">Prof. Lambropoulous</td>
+			            			  		          		</tr>
+			            			  		              	<tr>       
+			            			  			                <td className="rowTitle">Description:</td>
+			            			  			                <td>yolo</td>
+			            			  		              </tr>
+		            			  	              		</tbody>
+		            			  	             	 </table>
+		            			  	            </div>
+		            			  	        </Col>
 
-		            			            	</div>
-		            			            </Col>
-		            			             </Row>
-		            			             <div className="cardButton">
-		            			               <Button id="select" variant="success">Select</Button>
-		            			               <Button id="wishlist" variant="danger">Add to wishlist</Button>
-		            			             </div>
-		            			           </Card.Body>
-		            			           <br />
-		            			         </Card>
-				            			</Col>
-			            		<Col xs={4}>
-			            			<div class="flip-div">
-            			               <div class="flip-main">
-            			                   <div class="front">
-            			                       <div class="card">
-            			                           <div class="card-body text-center pb-2">
-            			                               <p><img class="rounded-circle" src="http://nicesnippets.com/demo/profile-2.png" /></p>
-            			                               <h5 class="card-title"><strong>Nike Tyson</strong></h5>
-            			                               <p class="card-text">This is basic user profile with image, title, detail and button.</p>
-            			                               <a href="#" class="btn btn-info btn-sm"><i class="fa fa-arrow-right"></i></a>
-            			                           </div>
-            			                       </div>
-            			                   </div>
-            			                   <div class="back rounded">
-            			                       <div class="card">
-            			                           <div class="card-body text-center">
-            			                               <h4 class="card-title"><strong>Nike Tyson</strong></h4>
-            			                               <p class="card-text">University</p>
-            			     
-            			                           </div>
-            			                       </div>
-            			                   </div>
-			            			    </div>
-			            			</div>           
+		            			  	        <Col xs={3} id="flagdiv">
+	            			  		           	<div id="flag">
+	            			  		           		<span id="flagtext">Course Rating</span> <br /><p id="courseScore">5</p>
+	            			  		           	</div>
+	            			  		           	<Rate allowHalf defaultValue={2.5} />
+	            			  	            </Col>
+	            			            </Row>
+	            			            <Row>
+	            			              	<div className="cardButtonMod">
+	            			  		           	<Button id="selectMod" variant="success">Add to Schedule</Button>
+	            			  		           	<Button id="wishlistMod" variant="danger">Add to Wishlist</Button>
+	            			  		           	<Button id="syllabusMod" variant="secondary">Syllabus</Button>
+	            			  		        </div>
+	            			            </Row>
+            			            </Card.Body>
+            			            <br />
+            			          </Card>
+
+            			          <div class="row bootstrap snippets">
+            			          		<div class="comment-wrapper">
+            			          		    <div class="panel panel-info">
+				          		                <div class="panel-body">
+				          		                    <textarea class="form-control" placeholder="Write a comment..." rows="3"></textarea>
+				          		                    <br />
+				          		                    <button type="button" class="btn btn-info pull-right">Post</button>
+				          		                    <div class="clearfix"></div>
+				          		                    <hr />
+				          		                    <ul class="media-list">
+					          		                    <li class="media">
+			                                                <a href="#" class="pull-left">
+			                                                    <img src="https://bootdey.com/img/Content/user_1.jpg" alt="" class="img-circle" />
+			                                                </a>
+			                                                <div class="media-body">
+			                                                    <span class="text-muted pull-right">
+			                                                        <small class="text-muted">30 min ago</small>
+			                                                    </span>
+			                                                    <strong class="text-success">@MartinoMont</strong>
+			                                                    <p>
+			                                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+			                                                        Lorem ipsum dolor sit amet, <a href="#">#consecteturadipiscing </a>.
+			                                                    </p>
+			                                                </div>
+			                                            </li>
+			                                            <li class="media">
+			                                                <a href="#" class="pull-left">
+			                                                    <img src="https://bootdey.com/img/Content/user_2.jpg" alt="" class="img-circle" />
+			                                                </a>
+			                                                <div class="media-body">
+			                                                    <span class="text-muted pull-right">
+			                                                        <small class="text-muted">30 min ago</small>
+			                                                    </span>
+			                                                    <strong class="text-success">@LaurenceCorreil</strong>
+			                                                    <p>
+
+			                                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+			                                                        Lorem ipsum dolor <a href="#">#ipsumdolor </a>adipiscing elit.
+			                                                    </p>
+			                                                </div>
+			                                            </li>
+			                                            <li class="media">
+			                                                <a href="#" class="pull-left">
+			                                                    <img src="https://bootdey.com/img/Content/user_3.jpg" alt="" class="img-circle" />
+			                                                </a>
+			                                                <div class="media-body">
+			                                                    <span class="text-muted pull-right">
+			                                                        <small class="text-muted">30 min ago</small>
+			                                                    </span>
+			                                                    <strong class="text-success">@JohnNida</strong>
+			                                                    <p>
+			                                                        Lorem ipsum dolor <a href="#">#sitamet</a> sit amet, consectetur adipiscing elit.
+			                                                    </p>
+			                                                </div>
+			                                            </li>
+		                                       		</ul>
+		                                    	</div>
+	                               			</div>
+            			   			</div>
+            					</div>
+       
+
+		            			</Col>
+			            		<Col xs={3}>
+			                       <div class="card">
+			                           <div class="card-body text-center pb-2">
+			                               <p><img class="rounded-circle" src="http://nicesnippets.com/demo/profile-2.png" width="100%" height="auto" /></p>
+			                               <h5 class="profCard-title"><strong>Nike Tyson</strong></h5>
+			                               <p class="profCard-text">This is basic user profile with image, title, detail and button.</p>
+			                           </div>
+			                       </div>
 			            		</Col>
 			            	</Row>
 			            </div>
