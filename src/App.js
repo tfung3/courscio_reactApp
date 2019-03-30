@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import {Card, Container, Row, Col, Form, Button, ButtonToolbar, ToggleButton, ToggleButtonGroup, Popover, OverlayTrigger} from 'react-bootstrap';
+import {Card, Container, Row, Collapse, Col, Form, Button, ButtonToolbar, ToggleButton, ToggleButtonGroup, Popover, OverlayTrigger} from 'react-bootstrap';
 import {Slider, Switch, Icon} from 'antd';
 import axios from 'axios';
 import './App.css';
@@ -131,23 +131,45 @@ class App extends Component {
 				i--
 				const courseRow = <Card className="classCard" bg="light" text="#383838" key={cur_course.key}>
           <Card.Body>
+          <Row>
+          <Col xs={10}>
             <Card.Title>{cur_course.cname}&nbsp;&nbsp;{cur_course.title}</Card.Title>
-            <Card.Subtitle className="text-muted">CRN&nbsp;{cur_course.crn}&nbsp;&nbsp;Credit:&nbsp;{cur_course.credit}</Card.Subtitle>
-            <div className="card-text">
+            <Card.Subtitle>CRN&nbsp;{cur_course.crn}&nbsp;&nbsp;Credit:&nbsp;{cur_course.credit}</Card.Subtitle>
+            <Card.Text>
               <table>
-              <tbody>      
-                  <tr>       
-                    <td className="rowTitle">Description:</td>
-                    <td>{cur_course.description}</td>
-                  </tr>
-                  <tr>
-                   <td className="rowTitle">Time:</td>
-                    <td className="trim-text">{cur_course.weekday}&nbsp;{cur_course.start_t}-{cur_course.end_t}</td>
-                    <td className="rowTitle">Location: </td>
-                    <td>{cur_course.location}</td>
-                  </tr>
+              	<tbody>     
+	          		<tr>
+	          		 <td className="rowTitle">Time:</td>
+	          		  <td id="time" width="30%">{cur_course.weekday}&nbsp;{cur_course.start_t}-{cur_course.end_t}</td>
+	          		  <td className="rowTitle" id="location">Location: </td>
+	          		  <td>{cur_course.location}</td>
+	          		</tr>
+	          		<tr>
+	          		 <td className="rowTitle">Instructor:</td>
+	          		 <td id="instructor">{cur_course.instructor}</td>
+	          		</tr> 
+	          	</tbody>
+	          </table>
+	          <table>
+	          	<tbody>
+	              <tr>       
+	                <td className="rowTitle">Description:</td>
+	                <td>{cur_course.description}</td>
+	              </tr>
               </tbody>
               </table>
+            </Card.Text>
+           </Col>
+           <Col xs={2}>
+           	<div id="flag">
+           		{cur_course.score} <br />
+
+           	</div>
+           </Col>
+            </Row>
+            <div className="cardButton">
+              <Button id="select" variant="success">Select</Button>
+              <Button id="wishlist" variant="danger">Add to wishlist</Button>
             </div>
             <button type="button" class="btn btn-info" data-toggle="modal" value={cur_course.id} data-target="#myModal" onClick={this.recordPopUpInfo}>Open Modal</button>
           </Card.Body>
@@ -265,7 +287,9 @@ render(){
 									And here's some <strong>amazing</strong> content. It's very engaging. right?
 								</Popover>
 							);
+
 		return (
+
 			<div className="App">
 				<div className="Container">
 					<Row>
@@ -429,7 +453,80 @@ render(){
 			                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 			                <h4 class="modal-title" id="myModalLabel">{this.state.cur_course}</h4>
 			            </div>
-			            <div class="modal-body">Lorem Ipsum</div>
+			            <div class="modal-body">
+			            	<Row>
+			            		<Col xs={8}>
+		            			  <Card className="classCard" bg="light" text="#383838" key={this.state.cur_course.key}>
+	            			           <Card.Body>
+	            			           <Row>
+		            			           <Col xs={10}>
+		            			             <Card.Title>{this.state.cur_course}&nbsp;&nbsp;TITLE</Card.Title>
+		            			             <Card.Subtitle>CRN&nbsp;12345&nbsp;&nbsp;Credit:&nbsp;4.0</Card.Subtitle>
+		            			             <Card.Text>
+		            			               <table>
+		            			               	<tbody>      
+		            			                   <tr>       
+		            			                     <td className="rowTitle">Description:</td>
+		            			                     <td>Lorem Ipsum</td>
+		            			                   </tr>
+		            			                   <tr>
+		            			                    <td className="rowTitle">Time:</td>
+		            			                     <td id="time">Monday&nbsp;900-1015</td>
+		            			                   </tr>
+		            			                   <tr>
+		            			                     <td className="rowTitle" id="location">Location: </td>
+		            			                     <td>Wegmans 1101</td>
+		            			                   </tr>
+		            			                   <tr>
+		            			                    <td className="rowTitle">Instructor:</td>
+		            			                    <td id="instructor">Ferguson, George</td>
+		            			                   </tr>
+		            			               </tbody>
+		            			               </table>
+		            			             </Card.Text>
+		            			            </Col>
+		            			            <Col xs={2}>
+		            			            	<div id="flag">
+		            			            		10 <br />
+
+		            			            	</div>
+		            			            </Col>
+		            			             </Row>
+		            			             <div className="cardButton">
+		            			               <Button id="select" variant="success">Select</Button>
+		            			               <Button id="wishlist" variant="danger">Add to wishlist</Button>
+		            			             </div>
+		            			           </Card.Body>
+		            			           <br />
+		            			         </Card>
+				            			</Col>
+			            		<Col xs={4}>
+			            			<div class="flip-div">
+            			               <div class="flip-main">
+            			                   <div class="front">
+            			                       <div class="card">
+            			                           <div class="card-body text-center pb-2">
+            			                               <p><img class="rounded-circle" src="http://nicesnippets.com/demo/profile-2.png" /></p>
+            			                               <h5 class="card-title"><strong>Nike Tyson</strong></h5>
+            			                               <p class="card-text">This is basic user profile with image, title, detail and button.</p>
+            			                               <a href="#" class="btn btn-info btn-sm"><i class="fa fa-arrow-right"></i></a>
+            			                           </div>
+            			                       </div>
+            			                   </div>
+            			                   <div class="back rounded">
+            			                       <div class="card">
+            			                           <div class="card-body text-center">
+            			                               <h4 class="card-title"><strong>Nike Tyson</strong></h4>
+            			                               <p class="card-text">University</p>
+            			     
+            			                           </div>
+            			                       </div>
+            			                   </div>
+			            			    </div>
+			            			</div>           
+			            		</Col>
+			            	</Row>
+			            </div>
 			            
 			        </div>
 			    </div>
