@@ -13,4 +13,10 @@ code {
     monospace;
 }
 
+.gButton {
+  padding-left:20px; 
+}
 
+.nav-item {
+  padding-top: 3px;
+}

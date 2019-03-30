@@ -1,36 +1,47 @@
 
 import React, { Component } from 'react';
-import {Card, Container, Modal, Row, Collapse, Col, Form, Button, ButtonToolbar, ToggleButton, ToggleButtonGroup, Popover, OverlayTrigger} from 'react-bootstrap';
-import {Slider, Switch, Rate, Icon} from 'antd';
+import {Card, Row, Col, Form, Button, ButtonToolbar, ToggleButton, ToggleButtonGroup, Popover, OverlayTrigger} from 'react-bootstrap';
+import {Slider, Rate} from 'antd';
 import axios from 'axios';
 import './App.css';
 
-const API = '/api/v1/course/filters?'
+const API = '/v1/'
 
 class App extends Component {
 	constructor(props) {
 		super(props)
-
+		const noCourse = {cname: "Error", credit: 0, crn: "00000", description: "Contact Enginner",
+		end_t: "2400", id:-1, key: "-1MON", location: "None", 
+		major: "None", name: "null", prerequisite: "No prerequisite", 
+		schoolId: -1, score: 0, semester: "Fall 2019", 
+		start_t:"0000", title: "System Error", weekday: "NO"};
 		this.state = {
+			token: "",
+			auth: "",
+			uid: 6,
 			courses: [],
+			courses_raw_data: [], //RenderedHtml, start_t, end_t, course_obj, weekdays
 			isLoading: false,
 			err: false,
 			dept: "Nothing",
 			weekdays: [],
 			semester: "Fall 2019",
 			school: "Arts, Science, and Engineering",
-			courses_raw_data: [],
 			slider_val: [800,2400],
-			cur_course: -1,
-			show: false,
+			cur_course: noCourse,
+			comment: "",
+			comments: []
 		}
 
 		this.ReMount = this.ReMount.bind(this)
 		this.onSliderChange = this.onSliderChange.bind(this)
 		this.time_filter = this.time_filter.bind(this)
 		this.recordPopUpInfo = this.recordPopUpInfo.bind(this)
-		this.handleShow = this.handleShow.bind(this);
-    	this.handleClose = this.handleClose.bind(this);
+		this.commentChange = this.commentChange.bind(this)
+		this.submitComment = this.submitComment.bind(this)
+		this.getCommentList = this.getCommentList.bind(this)
+		this.findCourseById = this.findCourseById.bind(this)
+		this.commentBlockBuilder = this.commentBlockBuilder.bind(this)
 
 
 	}
@@ -114,7 +125,7 @@ class App extends Component {
 
 		try{
 			var courseRows_raw = []
-			let query = 'major=' + encodeURIComponent(subject) + '&semester=' + encodeURIComponent(this.state.semester)
+			let query = 'course/filters?major=' + encodeURIComponent(subject) + '&semester=' + encodeURIComponent(this.state.semester)
 			const weekdays = this.state.weekdays
 			console.log(weekdays)
 			weekdays.forEach((day)=>{
@@ -135,51 +146,51 @@ class App extends Component {
 				}
 				i--
 				const courseRow = <Card className="classCard" bg="light" text="#383838" key={cur_course.key}>
-          <Card.Body>
-          <Row>
-	          <Col tag="a" onClick={this.handleShow} style={{ cursor: "pointer"}} xs={9} id="courseInfo">
-	            <Card.Title>{cur_course.cname}&nbsp;&nbsp;{cur_course.title}</Card.Title>
-	            <Card.Subtitle>CRN&nbsp;{cur_course.crn}&nbsp;&nbsp;{cur_course.credit}&nbsp;Credits</Card.Subtitle>
-	            <div className="card-text">
-	              <table>
-	              	<tbody>     
-		          		<tr>
-		          		 	<td className="rowTitle">Time:</td>
-		          		    <td id="time">{weekdayRow}&nbsp;{cur_course.start_t}-{cur_course.end_t}</td>
-		          		</tr>
-		          		<tr>
-			          		<td className="rowTitle">Location: </td>
-			          		<td>{cur_course.location}</td>
-		          		</tr>
-		          		<tr>
-			          		<td className="rowTitle">Instructor:</td>
-			          		<td id="instructor">{cur_course.instructor}</td>
-		          		</tr>
-		              	<tr>       
-			                <td className="rowTitle">Description:</td>
-			                <td>{cur_course.description}</td>
-		              </tr>
-	              </tbody>
-	              </table>
-	            </div>
-	            </Col>
-	            <Col xs={3} id="flagdiv">
-		           	<div id="flag">
-		           		<span id="flagtext">Course Rating</span> <br /><p id="courseScore">{cur_course.score}</p>
-		           	</div>
-		           	<div className="cardButton">
-		           	  <Button id="select" variant="success">Add to Schedule</Button>
-		           	  <Button id="wishlist" variant="danger">Add to Wishlist</Button>
-		           	</div>
-	            </Col>
-            </Row>
-          </Card.Body>
-          <br />
-        </Card>
-				courseRows_raw.push([courseRow,cur_course.start_t,cur_course.end_t])
+				  <Card.Body>
+				  <Row>
+					  <Col tag="a" className="card_padding" data-toggle="modal" id={cur_course.id} data-target="#myModal" onClick={this.recordPopUpInfo} style={{ cursor: "pointer"}} xs={9}>
+						<Card.Title>{cur_course.cname}&nbsp;&nbsp;{cur_course.title}</Card.Title>
+						<Card.Subtitle>CRN&nbsp;{cur_course.crn}&nbsp;&nbsp;{cur_course.credit}&nbsp;Credits</Card.Subtitle>
+						<div className="card-text">
+						  <table>
+							<tbody>     
+								<tr>
+									<td className="rowTitle">Time:</td>
+									<td id="time">{weekdayRow}&nbsp;{cur_course.start_t}-{cur_course.end_t}</td>
+								</tr>
+								<tr>
+									<td className="rowTitle">Location: </td>
+									<td>{cur_course.location}</td>
+								</tr>
+								<tr>
+									<td className="rowTitle">Instructor:</td>
+									<td id="instructor">{cur_course.instructor}</td>
+								</tr>
+								<tr>       
+									<td className="rowTitle">Description:</td>
+									<td>{cur_course.description}</td>
+							  </tr>
+						  </tbody>
+						  </table>
+						</div>
+						</Col>
+						<Col xs={3} id="flagdiv">
+							<div id="flag">
+								<span id="flagtext">Course Rating</span> <br /><p id="courseScore">{cur_course.score}</p>
+							</div>
+							<div className="cardButton">
+							  <Button id="select" value= {cur_course.id} variant="success">Add to Schedule</Button>
+							  <Button id="wishlist" value= {cur_course.id} variant="danger">Add to Wishlist</Button>
+							</div>
+						</Col>
+					</Row>
+				  </Card.Body>
+				  <br />
+				</Card>
+				courseRows_raw.push([courseRow,cur_course.start_t,cur_course.end_t, cur_course, weekdayRow])
 			}
 			var courseRows = this.time_filter(courseRows_raw, a, b)
-			console.log(courseRows)
+			console.log(courseRows_raw)
 			this.setState({
 				courses: courseRows,
 				courses_raw_data: courseRows_raw
@@ -195,10 +206,22 @@ class App extends Component {
 	}
 
 	recordPopUpInfo(e){
-		console.log(e.target.value)
 		this.setState({
-			cur_course: e.target.value
+			cur_course: this.findCourseById(this.state.courses_raw_data, e.currentTarget.id)
 		})
+		this.getCommentList(e.currentTarget.id)
+	}
+
+	findCourseById(raw_data, cid){
+		for (var i= 0; i< raw_data.length; i++){
+			if (raw_data[i].length === 5){
+				if (parseInt(raw_data[i][3].id) === parseInt(cid)){
+					return raw_data[i][3]
+				}
+			}
+		}
+		console.log("Course not found, fatal logical error")
+		return undefined
 	}
 
 	onSliderChange(value){
@@ -220,7 +243,9 @@ class App extends Component {
 			b = 2400
 		}
 		console.log('onAfterChange: ', a, b);
-		this.state.slider_val = [a,b]
+		this.setState({
+			slider_val: [a, b]
+		})
 		const courses = this.time_filter(this.state.courses_raw_data, a, b)
 		console.log()
 		this.setState({
@@ -263,14 +288,53 @@ class App extends Component {
 		}
 	}
 
-	handleClose() {
-	  this.setState({ show: false });
+	commentChange(event){
+		this.setState({
+			comment: event.target.value
+		})
 	}
 
-
-	handleShow() {
-	  this.setState({ show: true });
+	async submitComment(event){
+		var toSubmit = this.state.comment;
+		var query = 'rating?comment='+ encodeURIComponent(toSubmit)+ '&teaching_id='+ this.state.cur_course.id+ '&user_id='+ this.state.uid;
+		console.log(query)
+		alert("Comment Successfully Submitted");
+		const response = await axios.post(API + query);
+		console.log(response)
+		this.setState({
+			comment: "",
+		})
+		this.getCommentList(this.state.cur_course.id)
 	}
+
+	async getCommentList(teaching_id){
+		var query = 'rating/'+teaching_id;
+		const response = await axios.get(API + query);
+		this.commentBlockBuilder(response.data)
+	}
+
+	commentBlockBuilder(comments_raw){
+		var comments = []
+		for (var i= 0; i< comments_raw.length; i++){
+			const commentrow = (
+				<li className="media" key={i}>
+					<a className="pull-left">
+					</a>
+					<div className="media-body shadow-sm p-3 mb-2 bg-white rounded">
+						<p>
+							{comments_raw[i].comment}
+						</p>
+					</div>
+				</li>
+			);
+			comments.push(commentrow)
+		}
+		this.setState({
+			comments: comments
+		})
+
+	}
+
 
 
 //  }
@@ -457,141 +521,100 @@ render(){
 						</Col>
 					</Row>
 
-					<Modal show={this.state.show} onHide={this.handleClose}>
-			            <div class="modal-header">
-			                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-			                <h4 class="modal-title" id="myModalLabel">{this.state.cur_course}</h4>
-			            </div>
-			            <div class="modal-body">
-			            	<Row>
-			            		<Col xs={8}>
-		            			  <Card className="classCard" bg="light" text="#383838">
-            			            <Card.Body>
-	            			            <Row>
-		            			  	        <Col xs={9} id="courseInfo">
-		            			  	            <Card.Title>CSC171&nbsp;&nbsp;Introduction of Computer</Card.Title>
-		            			  	            <Card.Subtitle>CRN&nbsp;12378&nbsp;&nbsp;4&nbsp;Credits</Card.Subtitle>
-		            			  	            <div className="card-text">
-		            			  	              	<table>
-		            			  	              		<tbody>     
-			            			  		          		<tr>
-			            			  		          		 	<td className="rowTitle">Time:</td>
-			            			  		          		    <td id="time">W 1230-1560</td>
-			            			  		          		</tr>
-			            			  		          		<tr>
-			            			  			          		<td className="rowTitle">Location: </td>
-			            			  			          		<td>Hutch</td>
-			            			  		          		</tr>
-			            			  		          		<tr>
-			            			  			          		<td className="rowTitle">Instructor:</td>
-			            			  			          		<td id="instructor">Prof. Lambropoulous</td>
-			            			  		          		</tr>
-			            			  		              	<tr>       
-			            			  			                <td className="rowTitle">Description:</td>
-			            			  			                <td>yolo</td>
-			            			  		              </tr>
-		            			  	              		</tbody>
-		            			  	             	 </table>
-		            			  	            </div>
-		            			  	        </Col>
+					<div className= "modal fade" id="myModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div className= "modal-dialog">
+						<div className="modal-content">
+						<div className="modal-header">
+							<button type="button" className="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						</div>
+						<div className="modal-body">
+							<Row>
+								<Col xs={8}>
+								  <Card className="classCard" bg="light" text="#383838">
+									<Card.Body>
+										<Row>
+											<Col xs={9} id="courseInfo">
+												<Card.Title>{this.state.cur_course.cname}&nbsp;&nbsp;{this.state.cur_course.title}</Card.Title>
+												<Card.Subtitle>CRN&nbsp;{this.state.cur_course.crn}&nbsp;&nbsp;{this.state.cur_course.credit}&nbsp;Credits</Card.Subtitle>
+												<div className="card-text">
+													<table>
+														<tbody>     
+															<tr>
+																<td className="rowTitle">Time:</td>
+																<td id="time">{this.state.cur_course.weekday} {this.state.cur_course.start_t}-{this.state.cur_course.end_t}</td>
+															</tr>
+															<tr>
+																<td className="rowTitle">Location: </td>
+																<td>{this.state.cur_course.location}</td>
+															</tr>
+															<tr>
+																<td className="rowTitle">Instructor:</td>
+																<td id="instructor">Prof.</td>
+															</tr>
+															<tr>       
+																<td className="rowTitle">Description:</td>
+																<td>{this.state.cur_course.description}</td>
+														  </tr>
+														</tbody>
+													 </table>
+												</div>
+											</Col>
 
-		            			  	        <Col xs={3} id="flagdiv">
-	            			  		           	<div id="flag">
-	            			  		           		<span id="flagtext">Course Rating</span> <br /><p id="courseScore">5</p>
-	            			  		           	</div>
-	            			  		           	<Rate allowHalf defaultValue={2.5}/>
-	            			  	            </Col>
-	            			            </Row>
-	            			            <Row>
-	            			              	<div className="cardButtonMod">
-	            			  		           	<Button id="selectMod"  variant="success">Add to Schedule</Button>
-	            			  		           	<Button id="wishlistMod"  variant="danger">Add to Wishlist</Button>
-	            			  		           	<Button id="syllabusMod"  variant="secondary">Syllabus</Button>
-	            			  		        </div>
-	            			            </Row>
-            			            </Card.Body>
-            			            <br />
-            			          </Card>
+											<Col xs={3} id="flagdiv">
+												<div id="flag">
+													<span id="flagtext">Course Rating</span> <br /><p id="courseScore">{this.state.cur_course.score}</p>
+												</div>
+												<Rate allowHalf defaultValue={2.5}/>
+											</Col>
+										</Row>
+										<Row>
+											<div className="cardButtonMod">
+												<Button id="selectMod"  variant="success">Add to Schedule</Button>
+												<Button id="wishlistMod"  variant="danger">Add to Wishlist</Button>
+												<Button id="syllabusMod"  variant="secondary">Syllabus</Button>
+											</div>
+										</Row>
+									</Card.Body>
+									<br />
+								  </Card>
 
-            			          <div class="row bootstrap snippets">
-            			          		<div class="comment-wrapper">
-            			          		    <div class="panel panel-info">
-				          		                <div class="panel-body">
-				          		                    <textarea class="form-control" placeholder="Write a comment..." rows="3"></textarea>
-				          		                    <br />
-				          		                    <button type="button" class="btn btn-info pull-right">Post</button>
-				          		                    <div class="clearfix"></div>
-				          		                    <hr />
-				          		                    <ul class="media-list">
-					          		                    <li class="media">
-			                                                <a href="#" class="pull-left">
-			                                                    <img src="https://bootdey.com/img/Content/user_1.jpg" alt="" class="img-circle" />
-			                                                </a>
-			                                                <div class="media-body">
-			                                                    <span class="text-muted pull-right">
-			                                                        <small class="text-muted">30 min ago</small>
-			                                                    </span>
-			                                                    <strong class="text-success">@MartinoMont</strong>
-			                                                    <p>
-			                                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+								  <div className="row bootstrap snippets">
+										<div className= "col-8 col-md-offset-2 col-sm-12">
+										<div className="comment-wrapper">
+											<div className= "panel-heading"></div>
+											<div className="panel panel-info">
+												<div className="panel-body">
+													<textarea className="form-control" value= {this.state.comment} onChange={this.commentChange} placeholder="Write a comment..." rows="3"></textarea>
+													<br />
+													<button type="button" className="btn btn-info pull-right" onClick={this.submitComment}>Post</button>
+													<div className="clearfix"></div>
+													<hr />
+													<ul className="media-list">
+														{this.state.comments}
+													</ul>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+	   
 
-			                                                        Lorem ipsum dolor sit amet, <a href="#">#consecteturadipiscing </a>.
-			                                                    </p>
-			                                                </div>
-			                                            </li>
-			                                            <li class="media">
-			                                                <a href="#" class="pull-left">
-			                                                    <img src="https://bootdey.com/img/Content/user_2.jpg" alt="" class="img-circle" />
-			                                                </a>
-			                                                <div class="media-body">
-			                                                    <span class="text-muted pull-right">
-			                                                        <small class="text-muted">30 min ago</small>
-			                                                    </span>
-			                                                    <strong class="text-success">@LaurenceCorreil</strong>
-			                                                    <p>
-
-			                                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-
-			                                                        Lorem ipsum dolor <a href="#">#ipsumdolor </a>adipiscing elit.
-			                                                    </p>
-			                                                </div>
-			                                            </li>
-			                                            <li class="media">
-			                                                <a href="#" class="pull-left">
-			                                                    <img src="https://bootdey.com/img/Content/user_3.jpg" alt="" class="img-circle" />
-			                                                </a>
-			                                                <div class="media-body">
-			                                                    <span class="text-muted pull-right">
-			                                                        <small class="text-muted">30 min ago</small>
-			                                                    </span>
-			                                                    <strong class="text-success">@JohnNida</strong>
-			                                                    <p>
-			                                                        Lorem ipsum dolor <a href="#">#sitamet</a> sit amet, consectetur adipiscing elit.
-			                                                    </p>
-			                                                </div>
-			                                            </li>
-		                                       		</ul>
-		                                    	</div>
-	                               			</div>
-            			   			</div>
-            					</div>
-       
-
-		            			</Col>
-			            		<Col xs={4}>
-			                       <div class="card">
-			                           <div class="card-body text-center pb-2">
-			                               <p><img class="rounded-circle portrait" src="http://nicesnippets.com/demo/profile-2.png" width="100%" height="auto" /></p>
-			                               <h5 class="profCard-title"><strong>Nike Tyson</strong></h5>
-			                               <p class="profCard-text">This is basic user profile with image, title, detail and button.</p>
-			                           </div>
-			                       </div>
-			            		</Col>
-			            	</Row>
-			            </div>
-			            
-			        </Modal>
-			    </div>
+								</Col>
+								<Col xs={4}>
+								   <div className="card">
+									   <div className="card-body text-center pb-2">
+										   <p><img className="rounded-circle portrait" src="http://nicesnippets.com/demo/profile-2.png" width="100%" height="auto" /></p>
+										   <h5 className="profCard-title"><strong>Nike Tyson</strong></h5>
+										   <p className="profCard-text">This is basic user profile with image, title, detail and button.</p>
+									   </div>
+								   </div>
+								</Col>
+							</Row>
+						</div>
+						</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		);
 	}

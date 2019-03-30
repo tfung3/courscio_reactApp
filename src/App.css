@@ -276,8 +276,14 @@ table {
   margin: 20px auto;
 }
 
+.card_padding {
+  padding-top: 1.5em;
+  padding-left: 2em;
+}
+
 .panel-body {
-  margin-left: 50px;
+  margin-left: 35px;
+  padding-right: 35px;
   width: 100%;
 }
 
