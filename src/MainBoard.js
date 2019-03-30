@@ -12,10 +12,16 @@ const GOOGLE_BUTTON_ID = 'google-sign-in-button';
 class MainBoard extends Component{
 	constructor(){
 		super()
+		const noCourse = {cname: "Error", credit: 0, crn: "00000", description: "Contact Enginner",
+		end_t: "2400", id:-1, key: "-1MON", location: "None", 
+		major: "None", name: "null", prerequisite: "No prerequisite", 
+		schoolId: -1, score: 0, semester: "Fall 2019", 
+		start_t:"0000", title: "System Error", weekday: "NO"};
 		this.state = {
 			isExist: true,
 			search: "NONE",
-			courses: []
+			courses: [],
+			cur_course: noCourse
 		}
 		this.handle_search = this.handle_search.bind(this);
 		this.doSearch = this.doSearch.bind(this)

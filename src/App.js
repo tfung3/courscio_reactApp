@@ -7,14 +7,16 @@ import './App.css';
 
 const API = '/v1/'
 
+const noCourse = {cname: "Error", credit: 0, crn: "00000", description: "Contact Enginner",
+end_t: "2400", id:-1, key: "-1MON", location: "None", 
+major: "None", name: "null", prerequisite: "No prerequisite", 
+schoolId: -1, score: 0, semester: "Fall 2019", 
+start_t:"0000", title: "System Error", weekday: "NO"};
+
 class App extends Component {
 	constructor(props) {
 		super(props)
-		const noCourse = {cname: "Error", credit: 0, crn: "00000", description: "Contact Enginner",
-		end_t: "2400", id:-1, key: "-1MON", location: "None", 
-		major: "None", name: "null", prerequisite: "No prerequisite", 
-		schoolId: -1, score: 0, semester: "Fall 2019", 
-		start_t:"0000", title: "System Error", weekday: "NO"};
+
 		this.state = {
 			token: "",
 			auth: "",
@@ -42,6 +44,7 @@ class App extends Component {
 		this.getCommentList = this.getCommentList.bind(this)
 		this.findCourseById = this.findCourseById.bind(this)
 		this.commentBlockBuilder = this.commentBlockBuilder.bind(this)
+		this.unloadCurCourse = this.unloadCurCourse.bind(this)
 
 
 	}
@@ -335,6 +338,12 @@ class App extends Component {
 
 	}
 
+	unloadCurCourse(){
+		this.setState({
+			cur_course: noCourse
+		})
+	}
+
 
 
 //  }
@@ -525,7 +534,7 @@ render(){
 					<div className= "modal-dialog">
 						<div className="modal-content">
 						<div className="modal-header">
-							<button type="button" className="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<button type="button" className="close" data-dismiss="modal" onClick={this.unloadCurCourse} aria-hidden="true">&times;</button>
 						</div>
 						<div className="modal-body">
 							<Row>
