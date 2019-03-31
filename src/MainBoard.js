@@ -72,7 +72,7 @@ class MainBoard extends Component{
 	}
 
 	async doSearch(keyword){
-		try{
+//		try{
 			var courseRows = []
 			let query = 'keyword=' + encodeURIComponent(keyword)
 			console.log(query)
@@ -80,13 +80,15 @@ class MainBoard extends Component{
 			console.log("wait over")
 			console.log(response)
 			var weekdayRow = ""
+			var weekdays = []
 			const filtered = response.data
 			for(var i= 0; i< filtered.length; i++) {
-				console.log(i)
 				weekdayRow = "";
+				weekdays = []
 				const cur_course = filtered[i];
 				while (i < filtered.length && cur_course.crn === filtered[i].crn){
 					weekdayRow = weekdayRow + " " + this.translate_weekday(filtered[i].weekday);
+					weekdays.push(filtered[i].weekday);
 					i++
 				}
 				i--
@@ -132,18 +134,19 @@ class MainBoard extends Component{
 				  </Card.Body>
 				  <br />
 				</Card>
-				courseRows.push(courseRow)
+				courseRows.push([courseRow, cur_course.start_t, cur_course.end_t, cur_course.major, weekdays])
 			}
 			this.setState({
-				courses: courseRows
+				courses: courseRows,
+				search: keyword
 			})
-		} catch {
-			console.log("ERROR")
-			this.setState({
-				err: true,
-				isLoading: false
-			})
-		}
+//		} catch {
+//			console.log("ERROR")
+//			this.setState({
+//				err: true,
+//				isLoading: false
+//			})
+//		}
 	}
 
 	render(){
@@ -177,7 +180,7 @@ class MainBoard extends Component{
 			</nav>  
 
 			<div id="root" className="fullroot"></div>
-			<App courses = {this.state.courses}/>
+			<App courses = {this.state.courses} keyword = {this.state.search}/>
 			</div>
 
 		

@@ -22,11 +22,13 @@ class App extends Component {
 			auth: "",
 			uid: 6,
 			courses: [],
+			resultPrompt: "",
 			courses_raw_data: [], //RenderedHtml, start_t, end_t, course_obj, weekdays
 			isLoading: false,
 			err: false,
 			dept: "Nothing",
 			weekdays: [],
+			isAdvancedSearch: true,
 			semester: "Fall 2019",
 			school: "Arts, Science, and Engineering",
 			slider_val: [800,2400],
@@ -45,8 +47,13 @@ class App extends Component {
 		this.findCourseById = this.findCourseById.bind(this)
 		this.commentBlockBuilder = this.commentBlockBuilder.bind(this)
 		this.unloadCurCourse = this.unloadCurCourse.bind(this)
-
-
+		this.dept_filter = this.dept_filter.bind(this)
+		this.weekday_filter = this.weekday_filter.bind(this)
+		this.raw_data_extract = this.raw_data_extract.bind(this)
+		this.searchActionInterpret = this.searchActionInterpret.bind(this)
+		this.render_key_word = this.render_key_word.bind(this)
+		this.onDestroySearchResult = this.onDestroySearchResult.bind(this)
+		this.onDateDeptChange = this.onDateDeptChange.bind(this)
 	}
 
 	async componentDidMount() {
@@ -84,18 +91,17 @@ class App extends Component {
 	}
 
 	componentWillReceiveProps(nextProps){
+		console.log(nextProps.courses)
+		var courses = this.raw_data_extract(this.weekday_filter(this.dept_filter(nextProps.courses, this.state.dept), this.state.weekdays));
 		this.setState({
-			courses: nextProps.courses,
+			courses: courses,
+			isAdvancedSearch: false,
+			courses_raw_data: nextProps.courses,
+			resultPrompt: this.render_key_word(this.props.keyword)
 		})
 	}
 
-	async ReMount(subject, weekday){
-		this.setState({
-			isLoading: true,
-			courses:[],
-			courses_raw_data: [],
-		});
-
+	searchActionInterpret(subject, weekday){
 		if (subject === 'NONE'){
 			subject = this.state.dept
 		}else{
@@ -103,40 +109,51 @@ class App extends Component {
 				dept: subject
 			})
 		}
-
-		//The start_t and end_t
-		const a = this.state.slider_val[0]
-		const b = this.state.slider_val[1]
-
-		console.log(subject);
+		var temp = []
 		if (weekday !== 'NONE'){
 			const weekdays = this.state.weekdays
 			if (weekdays.includes(weekday)){
 				var index = weekdays.indexOf(weekday)
 				const newdays = weekdays.slice(0, index).concat(weekdays.slice(index+1,weekdays.length))
+				temp = newdays
 				this.setState({
 					weekdays: newdays
 				})
 			}else{
 				let days = this.state.weekdays
 				days.push(weekday)
+				temp = days
 				this.setState({
 					weekdays: days
 				})
 			}
 		}
+		if (this.state.isAdvancedSearch === true){
+			this.ReMount(subject)
+		}else{
+			this.onDateDeptChange(temp, subject)
+		}
+	}
+
+	async ReMount(subject){
+		this.setState({
+			isLoading: true,
+			courses:[],
+			courses_raw_data: [],
+		});
+
+		//The start_t and end_t
+		const a = this.state.slider_val[0]
+		const b = this.state.slider_val[1]
 
 		try{
 			var courseRows_raw = []
 			let query = 'course/filters?major=' + encodeURIComponent(subject) + '&semester=' + encodeURIComponent(this.state.semester)
 			const weekdays = this.state.weekdays
-			console.log(weekdays)
 			weekdays.forEach((day)=>{
 				query = query + '&weekdays=' + day
 			})
-			console.log(query)
 			const response = await axios.get(API + query)
-			console.log("wait over")
 			console.log(response)
 			var weekdayRow = ""
 			const filtered = response.data
@@ -227,6 +244,19 @@ class App extends Component {
 		return undefined
 	}
 
+	onDateDeptChange(weekdays, dept){
+		console.log(weekdays)
+		console.log(dept)
+		const dept_clear_courses = this.dept_filter(this.state.courses_raw_data, dept)
+		console.log(dept_clear_courses)
+		const weekday_clear_courses = this.weekday_filter(dept_clear_courses, weekdays)
+		console.log(weekday_clear_courses)
+		const courses = this.raw_data_extract(weekday_clear_courses)
+		this.setState({
+			courses: courses
+		})
+	}
+
 	onSliderChange(value){
 		var a = parseFloat(value[0])
 		var b = parseFloat(value[1])
@@ -249,7 +279,7 @@ class App extends Component {
 		this.setState({
 			slider_val: [a, b]
 		})
-		const courses = this.time_filter(this.state.courses_raw_data, a, b)
+		const courses = this.time_filter(this.weekday_filter(this.dept_filter(this.state.courses_raw_data,this.state.dept),this.state.weekdays), a, b)
 		console.log()
 		this.setState({
 			courses: courses
@@ -264,6 +294,76 @@ class App extends Component {
 			}
 		}
 		return courseRows
+	}
+
+	dept_filter(tuples, dept){
+		var raw_data = []
+		if (tuples.length> 0 && tuples[0].length> 3 && dept !== "Nothing"){
+			for (var i=0; i<tuples.length; i++){
+				if (tuples[i][3] === dept){
+					raw_data.push(tuples[i])
+				}
+			}
+			return raw_data
+		}else{
+			return tuples
+		}
+	}
+
+	weekday_filter(tuples, weekdays){
+		var raw_data = []
+		if (tuples.length > 0 && tuples[0].length> 4 && weekdays.length > 0){
+			for (var i=0; i< tuples.length; i++){
+				for (var j=0; j< weekdays.length; j++){
+					var found = false
+					for (var k=0; k< tuples[i][4].length; k++){
+						if (tuples[i][4][k] === weekdays[j]){
+							found = true
+						}
+					}
+					if (found){
+						raw_data.push(tuples[i]);
+						break;
+					}
+				}
+			}
+			return raw_data;
+		}else{
+			return tuples;
+		}
+	}
+
+	raw_data_extract(tuples){
+		var courseRows = []
+		for (var i = 0; i< tuples.length; i++){
+			courseRows.push(tuples[i][0]);
+		}
+		return courseRows;
+	}
+
+	render_key_word(keyword){
+		return (
+			<Card className="classCard" bg="light" text="#383838" key="-1">
+				<Card.Body>
+				<Row>
+					<Col tag="a" className="card_padding" id="void" onClick={this.onDestroySearchResult} style={{ cursor: "pointer"}} xs={9}>
+						<Card.Title>Showing Result for: {keyword}</Card.Title>
+						<Card.Subtitle>Click to void search result</Card.Subtitle>
+					</Col>
+				</Row>
+				</Card.Body>
+				<br />
+			</Card>
+		);
+	}
+
+	onDestroySearchResult(){
+		this.setState({
+			courses: [],
+			isAdvancedSearch: true,
+			courses_raw_data: [],
+			resultPrompt: ""
+		})
 	}
 
 
@@ -401,9 +501,9 @@ render(){
 								</Form.Group>
 
 								<Form.Group as={Col} className="formGroup" controlId="formGridDept">
-									<Form.Control as="select" className="formControl" onChange={(event) => this.ReMount(event.target.value,"NONE")}>
+									<Form.Control as="select" className="formControl" onChange={(event) => this.searchActionInterpret(event.target.value,"NONE")}>
 										<option hidden>Department</option>
-										<option></option>
+										<option value="Nothing"></option>
 										<option value="African &amp; African-American Studies">AAS - African &amp; African-American Studies</option>
 										<option value="Art &amp; Art History">AH - Art &amp; Art History</option>
 										<option value="Anthropology">ANT - Anthropology</option>
@@ -500,11 +600,11 @@ render(){
 
 								<ButtonToolbar xs={12} md={3} lg={2}>
 									<ToggleButtonGroup type="checkbox" defaultValue={[1, 3]}>
-										<ToggleButton value={'MON'} onChange={(event) => this.ReMount('NONE', event.target.value)}>M</ToggleButton>
-										<ToggleButton value={'TUE'} onChange={(event) => this.ReMount('NONE', event.target.value)}>T</ToggleButton>
-										<ToggleButton value={'WEN'} onChange={(event) => this.ReMount('NONE', event.target.value)}>W</ToggleButton>
-										<ToggleButton value={'THU'} onChange={(event) => this.ReMount('NONE', event.target.value)}>Th</ToggleButton>
-										<ToggleButton value={'FRI'} onChange={(event) => this.ReMount('NONE', event.target.value)}>F</ToggleButton>
+										<ToggleButton value={'MON'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>M</ToggleButton>
+										<ToggleButton value={'TUE'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>T</ToggleButton>
+										<ToggleButton value={'WEN'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>W</ToggleButton>
+										<ToggleButton value={'THU'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>Th</ToggleButton>
+										<ToggleButton value={'FRI'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>F</ToggleButton>
 									</ToggleButtonGroup>
 								</ButtonToolbar>
 
@@ -513,6 +613,7 @@ render(){
 							</div>
 						</Col>
 						<Col xs={12} md={7} lg={7}>
+							{this.state.resultPrompt}
 							{this.state.courses}
 						</Col>
 						<Col xs={0} md={2} lg={1}>
