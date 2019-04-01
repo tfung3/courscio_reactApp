@@ -20,8 +20,7 @@ class MainBoard extends Component{
 		this.state = {
 			isExist: true,
 			search: "NONE",
-			courses: [],
-			cur_course: noCourse
+			response: "",
 		}
 		this.handle_search = this.handle_search.bind(this);
 		this.doSearch = this.doSearch.bind(this)
@@ -73,73 +72,17 @@ class MainBoard extends Component{
 
 	async doSearch(keyword){
 //		try{
-			var courseRows = []
+			
 			let query = 'keyword=' + encodeURIComponent(keyword)
 			console.log(query)
 			const response = await axios.get(API + query)
 			console.log("wait over")
 			console.log(response)
-			var weekdayRow = ""
-			var weekdays = []
-			const filtered = response.data
-			for(var i= 0; i< filtered.length; i++) {
-				weekdayRow = "";
-				weekdays = []
-				const cur_course = filtered[i];
-				while (i < filtered.length && cur_course.crn === filtered[i].crn){
-					weekdayRow = weekdayRow + " " + this.translate_weekday(filtered[i].weekday);
-					weekdays.push(filtered[i].weekday);
-					i++
-				}
-				i--
-				const courseRow = <Card className="classCard" bg="light" text="#383838" key={i}>
-				  <Card.Body>
-				  <Row>
-					  <Col tag="a" className="card_padding" data-toggle="modal" id={i} data-target="#myModal" onClick={this.recordPopUpInfo} style={{ cursor: "pointer"}} xs={9}>
-						<Card.Title>{cur_course.cname}&nbsp;&nbsp;{cur_course.title}</Card.Title>
-						<Card.Subtitle>CRN&nbsp;{cur_course.crn}&nbsp;&nbsp;{cur_course.credit}&nbsp;Credits</Card.Subtitle>
-						<div className="card-text">
-						  <table>
-							<tbody>     
-								<tr>
-									<td className="rowTitle">Time:</td>
-									<td id="time">{weekdayRow}&nbsp;{cur_course.start_t}-{cur_course.end_t}</td>
-								</tr>
-								<tr>
-									<td className="rowTitle">Location: </td>
-									<td>{cur_course.location}</td>
-								</tr>
-								<tr>
-									<td className="rowTitle">Instructor:</td>
-									<td id="instructor">{cur_course.instructor}</td>
-								</tr>
-								<tr>       
-									<td className="rowTitle">Description:</td>
-									<td>{cur_course.description}</td>
-							  </tr>
-						  </tbody>
-						  </table>
-						</div>
-						</Col>
-						<Col xs={3} id="flagdiv">
-							<div id="flag">
-								<span id="flagtext">Course Rating</span> <br /><p id="courseScore">{cur_course.score}</p>
-							</div>
-							<div className="cardButton">
-							  <Button id="select" value= {cur_course.id} variant="success">Add to Schedule</Button>
-							  <Button id="wishlist" value= {cur_course.id} variant="danger">Add to Wishlist</Button>
-							</div>
-						</Col>
-					</Row>
-				  </Card.Body>
-				  <br />
-				</Card>
-				courseRows.push([courseRow, cur_course.start_t, cur_course.end_t, cur_course.major, weekdays])
-			}
 			this.setState({
-				courses: courseRows,
+				response: response.data,
 				search: keyword
 			})
+			
 //		} catch {
 //			console.log("ERROR")
 //			this.setState({
@@ -156,7 +99,7 @@ class MainBoard extends Component{
 			<nav className="row navbar navbar-expand-lg navbar-light">
 				<div className= "col-sm-0 col-md-0 col-lg-1"></div>
 				
-				<a className="navbar-brand col-sm-1 col-md-1 col-lg-1" href="home.html">
+				<a className="navbar-brand col-sm-1 col-md-1 col-lg-2" href="home.html" id="symbol">
 					<img className="image-fluid col-xs-1" id="logo" src="/Logo.png" alt="logo"/>
 				</a>    
 
@@ -180,7 +123,7 @@ class MainBoard extends Component{
 			</nav>  
 
 			<div id="root" className="fullroot"></div>
-			<App courses = {this.state.courses} keyword = {this.state.search}/>
+			<App response = {this.state.response} keyword = {this.state.search}/>
 			</div>
 
 		

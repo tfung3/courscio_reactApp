@@ -6,9 +6,6 @@
 
 }
 
-@media (min-width: 360px){
-  .modal-dialog {max-width: none;}
-}
 
 .classCard {
   
@@ -62,12 +59,27 @@ option{
   color: red;
 }
 
+#weekBar{
+  padding-left: 10px;
+}
+
 .btn-group-toggle, .btn-toolbar {
   margin: auto;
   display: flex;
   flex-direction: row;
   justify-content: center;
 
+}
+
+.noCourse-card{
+  border-color: transparent;
+  box-shadow: 0px 0px 0px transparent !important;
+}
+
+.card-img-bottom {
+  width: 60% !important;
+  height: auto;
+  margin: auto;
 }
 
 
@@ -291,3 +303,22 @@ table {
   float: right;
 }
 
+@media only screen and (max-width:768px){
+  #extraBtn {
+    display: none;
+  }
+  
+  #notVisible {
+    display: none;
+  }
+  #visible{
+    display: inline;
+  }
+  /* #filterdiv{
+    display: block;
+  } */
+}
+
+@media (min-width: 360px){
+  .modal-dialog {max-width: none;}
+}

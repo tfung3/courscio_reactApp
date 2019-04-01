@@ -54,6 +54,13 @@ class App extends Component {
 		this.render_key_word = this.render_key_word.bind(this)
 		this.onDestroySearchResult = this.onDestroySearchResult.bind(this)
 		this.onDateDeptChange = this.onDateDeptChange.bind(this)
+		this.renderCardList = this.renderCardList.bind(this)
+	}
+
+	clicked(){
+	    this.setState({
+	      showMe : ! this.state.showMe
+	    })
 	}
 
 	async componentDidMount() {
@@ -67,13 +74,11 @@ class App extends Component {
 		try{
 			var courseRows = []
 			var courseRows_raw = []
-			const courseRow = <Card className="classCard" bg="dark" text="white" key="0">
+			const courseRow = <Card className="noCourse-card" text="black" key="0">
 					<Card.Body>
-						<Card.Title>You have not chose anything</Card.Title>
-						<Card.Text>
-							Use the filter or search box to find courses
-						</Card.Text>
+						<Card.Title>Use the filter or search box to find courses</Card.Title>
 					</Card.Body>
+					<img class="card-img-bottom" src="comics/noCourse.png" alt="noCourse" />
 					<br />
 				</Card>
 			courseRows.push(courseRow)
@@ -91,12 +96,15 @@ class App extends Component {
 	}
 
 	componentWillReceiveProps(nextProps){
-		console.log(nextProps.courses)
-		var courses = this.raw_data_extract(this.weekday_filter(this.dept_filter(nextProps.courses, this.state.dept), this.state.weekdays));
+		
+		var raw_data = this.renderCardList(nextProps.response)
+		var courses = this.raw_data_extract(this.weekday_filter(this.dept_filter(raw_data, this.state.dept), this.state.weekdays));
+		console.log(raw_data)
+		console.log(courses)
 		this.setState({
-			courses: courses,
 			isAdvancedSearch: false,
-			courses_raw_data: nextProps.courses,
+			courses_raw_data: raw_data,
+			courses: courses,
 			resultPrompt: this.render_key_word(this.props.keyword)
 		})
 	}
@@ -129,13 +137,78 @@ class App extends Component {
 			}
 		}
 		if (this.state.isAdvancedSearch === true){
-			this.ReMount(subject)
+			this.ReMount(subject, temp)
 		}else{
 			this.onDateDeptChange(temp, subject)
 		}
 	}
 
-	async ReMount(subject){
+	renderCardList(response){
+		var courseRows_raw = []
+		var weekdayRow = ""
+		var weekdays = []
+		const filtered = response
+		for(var i= 0; i< filtered.length; i++) {
+			weekdayRow = "";
+			weekdays = []
+			const cur_course = filtered[i];
+			while (i < filtered.length && cur_course.crn === filtered[i].crn){
+				weekdayRow = weekdayRow + " " + this.translate_weekday(filtered[i].weekday);
+				weekdays.push(filtered[i].weekday);
+				i++
+			}
+			i--
+			const courseRow = <Card className="classCard" bg="light" text="#383838" key={cur_course.key}>
+			  <Card.Body>
+			  <Row>
+				  <Col tag="a" className="card_padding" data-toggle="modal" id={cur_course.id} data-target="#myModal" onClick={this.recordPopUpInfo} style={{ cursor: "pointer"}} xs={9}>
+					<Card.Title>{cur_course.cname}&nbsp;&nbsp;{cur_course.title}</Card.Title>
+					<Card.Subtitle>CRN&nbsp;{cur_course.crn}&nbsp;&nbsp;{cur_course.credit}&nbsp;Credits</Card.Subtitle>
+					<div className="card-text">
+					  <table>
+						<tbody>     
+							<tr>
+								<td className="rowTitle">Time:</td>
+								<td id="time">{weekdayRow}&nbsp;{cur_course.start_t}-{cur_course.end_t}</td>
+							</tr>
+							<tr>
+								<td className="rowTitle">Location: </td>
+								<td>{cur_course.location}</td>
+							</tr>
+							<tr>
+								<td className="rowTitle">Instructor:</td>
+								<td id="instructor">{cur_course.instructor}</td>
+							</tr>
+							<tr>       
+								<td className="rowTitle">Description:</td>
+								<td>{cur_course.description}</td>
+						  </tr>
+					  </tbody>
+					  </table>
+					</div>
+					</Col>
+					<Col xs={3} id="flagdiv">
+						<div id="flag">
+							<span id="flagtext">Course Rating</span> <br /><p id="courseScore">{cur_course.score}</p>
+						</div>
+						<div className="cardButton">
+						  <Button id="select" value= {cur_course.id} variant="success">Add to Schedule</Button>
+						  <Button id="wishlist" value= {cur_course.id} variant="danger">Add to Wishlist</Button>
+						</div>
+					</Col>
+				</Row>
+			  </Card.Body>
+			  <br />
+			</Card>
+			courseRows_raw.push([courseRow, cur_course.start_t, cur_course.end_t, cur_course.major, weekdays, cur_course])
+		}
+		this.setState({
+			courses_raw_data: courseRows_raw
+		})
+		return courseRows_raw
+	}
+
+	async ReMount(subject, weekdays){
 		this.setState({
 			isLoading: true,
 			courses:[],
@@ -147,68 +220,14 @@ class App extends Component {
 		const b = this.state.slider_val[1]
 
 		try{
-			var courseRows_raw = []
 			let query = 'course/filters?major=' + encodeURIComponent(subject) + '&semester=' + encodeURIComponent(this.state.semester)
-			const weekdays = this.state.weekdays
+			console.log(weekdays)
 			weekdays.forEach((day)=>{
 				query = query + '&weekdays=' + day
 			})
 			const response = await axios.get(API + query)
 			console.log(response)
-			var weekdayRow = ""
-			const filtered = response.data
-			for(var i= 0; i< filtered.length; i++) {
-				weekdayRow = "";
-				const cur_course = filtered[i];
-				while (i < filtered.length && cur_course.id === filtered[i].id){
-					weekdayRow = weekdayRow + " " + this.translate_weekday(filtered[i].weekday);
-					i++
-				}
-				i--
-				const courseRow = <Card className="classCard" bg="light" text="#383838" key={cur_course.key}>
-				  <Card.Body>
-				  <Row>
-					  <Col tag="a" className="card_padding" data-toggle="modal" id={cur_course.id} data-target="#myModal" onClick={this.recordPopUpInfo} style={{ cursor: "pointer"}} xs={9}>
-						<Card.Title>{cur_course.cname}&nbsp;&nbsp;{cur_course.title}</Card.Title>
-						<Card.Subtitle>CRN&nbsp;{cur_course.crn}&nbsp;&nbsp;{cur_course.credit}&nbsp;Credits</Card.Subtitle>
-						<div className="card-text">
-						  <table>
-							<tbody>     
-								<tr>
-									<td className="rowTitle">Time:</td>
-									<td id="time">{weekdayRow}&nbsp;{cur_course.start_t}-{cur_course.end_t}</td>
-								</tr>
-								<tr>
-									<td className="rowTitle">Location: </td>
-									<td>{cur_course.location}</td>
-								</tr>
-								<tr>
-									<td className="rowTitle">Instructor:</td>
-									<td id="instructor">{cur_course.instructor}</td>
-								</tr>
-								<tr>       
-									<td className="rowTitle">Description:</td>
-									<td>{cur_course.description}</td>
-							  </tr>
-						  </tbody>
-						  </table>
-						</div>
-						</Col>
-						<Col xs={3} id="flagdiv">
-							<div id="flag">
-								<span id="flagtext">Course Rating</span> <br /><p id="courseScore">{cur_course.score}</p>
-							</div>
-							<div className="cardButton">
-							  <Button id="select" value= {cur_course.id} variant="success">Add to Schedule</Button>
-							  <Button id="wishlist" value= {cur_course.id} variant="danger">Add to Wishlist</Button>
-							</div>
-						</Col>
-					</Row>
-				  </Card.Body>
-				  <br />
-				</Card>
-				courseRows_raw.push([courseRow,cur_course.start_t,cur_course.end_t, cur_course, weekdayRow])
-			}
+			var courseRows_raw = this.renderCardList(response.data)
 			var courseRows = this.time_filter(courseRows_raw, a, b)
 			console.log(courseRows_raw)
 			this.setState({
@@ -226,6 +245,7 @@ class App extends Component {
 	}
 
 	recordPopUpInfo(e){
+		console.log("open details")
 		this.setState({
 			cur_course: this.findCourseById(this.state.courses_raw_data, e.currentTarget.id)
 		})
@@ -233,10 +253,12 @@ class App extends Component {
 	}
 
 	findCourseById(raw_data, cid){
+		console.log(raw_data)
+		console.log(cid)
 		for (var i= 0; i< raw_data.length; i++){
-			if (raw_data[i].length === 5){
-				if (parseInt(raw_data[i][3].id) === parseInt(cid)){
-					return raw_data[i][3]
+			if (raw_data[i].length === 6){
+				if (parseInt(raw_data[i][5].id) === parseInt(cid)){
+					return raw_data[i][5]
 				}
 			}
 		}
@@ -364,6 +386,7 @@ class App extends Component {
 			courses_raw_data: [],
 			resultPrompt: ""
 		})
+		this.ReMount(this.state.dept, this.state.weekdays)
 	}
 
 
@@ -466,10 +489,25 @@ render(){
 		};
 
 		const popover = (
-								<Popover id="popover-basic" title="Popover right">
-									And here's some <strong>amazing</strong> content. It's very engaging. right?
-								</Popover>
-							);
+			<Popover id="popover-basic" title="Popover right">
+				And here's some <strong>amazing</strong> content. It's very engaging. right?
+			</Popover>
+		);
+
+		const showMe = this.state.showMe;
+		var v;
+		let button;
+
+		if(showMe){
+		     v = "visible";
+		     console.log('vis')
+		   }
+		   else{
+		     v= "notVisible";
+		
+		     console.log('not')
+		
+		   }
 
 
 		return (
@@ -481,9 +519,13 @@ render(){
 						</Col>
 						<Col className="filterLarge" xs={12} md={3} lg={2}>
 							<div container="true" className="filtersmall">
+								<button variant="primary" onClick={() => this.clicked() }>
+					              	<div>
+					                	<p id="filterWord">FILTER BY</p>
+					                </div>
+					            </button>
 
-								<p id="filterWord">FILTER BY</p>
-
+					            <div id = {v}>
 								<Form.Group as={Col} className="formGroup" controlId="formGridTerm">
 									<Form.Control as="select" className="formControl" defaultValue= "Fall 2019">
 										<option hidden>Term</option>
@@ -491,7 +533,9 @@ render(){
 										<option>Fall 2019</option>
 									</Form.Control>
 								</Form.Group>
+								</div>
 
+								<div id = {v}>
 								<Form.Group as={Col} className="formGroup" controlId="formGridSchool">
 									<Form.Control as="select" className="formControl" defaultValue= "Arts, Science, and Engineering">
 										<option hidden>School</option>
@@ -499,117 +543,119 @@ render(){
 										<option>Arts, Science, and Engineering</option>
 									</Form.Control>
 								</Form.Group>
-
-								<Form.Group as={Col} className="formGroup" controlId="formGridDept">
-									<Form.Control as="select" className="formControl" onChange={(event) => this.searchActionInterpret(event.target.value,"NONE")}>
-										<option hidden>Department</option>
-										<option value="Nothing"></option>
-										<option value="African &amp; African-American Studies">AAS - African &amp; African-American Studies</option>
-										<option value="Art &amp; Art History">AH - Art &amp; Art History</option>
-										<option value="Anthropology">ANT - Anthropology</option>
-										<option value="Religion &amp; Classics  Arabic">ARA - Religion &amp; Classics - Arabic</option>
-										<option value="American Sign Language">ASL - American Sign Language</option>
-										<option value="Audio Music Engineering">AME - Audio Music Engineering</option>
-										<option value="American Studies">AMS - American Studies</option>
-										<option value="Astronomy">AST - Astronomy</option>
-										<option value="Archeology Tech &amp; Hist Structure">ATH - Archeology Tech &amp; Hist Structure</option>
-										<option value="Brain and Cognitive Sciences">BCS - Brain and Cognitive Sciences</option>
-										<option value="Biology">BIO - Biology</option>
-										<option value="Biomedical Engineering">BME - Biomedical Engineering</option>
-										<option value="College of Arts &amp; Science">CAS - College of Arts &amp; Science</option>
-										<option value="Religion &amp; Classics  Classical Greek">CGR - Religion &amp; Classics - Classical Greek</option>
-										<option value="Chemical Engineering">CHE - Chemical Engineering</option>
-										<option value="Modern Languages &amp; Cultures  Chinese">CHI - Modern Languages &amp; Cultures - Chinese</option>
-										<option value="Chemistry">CHM - Chemistry</option>
-										<option value="Religion &amp; Classics  Classical Studies">CLA - Religion &amp; Classics - Classical Studies</option>
-										<option value="Modern Languages &amp; Cultures  Comparative Literature">CLT - Modern Languages &amp; Cultures - Comparative Literature</option>
-										<option value="Computer Science">CSC - Computer Science</option>
-										<option value="Clinical and Social Sciences in Psychology">CSP - Clinical and Social Sciences in Psychology</option>
-										<option value="Center for Visual Science">CVS - Center for Visual Science</option>
-										<option value="Dance">DAN - Dance</option>
-										<option value="Data Science &amp; Computation">DSC - Data Science &amp; Computation</option>
-										<option value="Digital Humanities">DH - Digital Humanities</option>
-										<option value="Digital Media Studies">DMS - Digital Media Studies</option>
-										<option value="Engineering and Applied Sciences">EAS - Engineering and Applied Sciences</option>
-										<option value="Electrical and Computer Engineering">ECE - Electrical and Computer Engineering</option>
-										<option value="Economics">ECO - Economics</option>
-										<option value="Earth &amp; Environmental Science">EES - Earth &amp; Environmental Science</option>
-										<option value="Environmental Humanities">EHU - Environmental Humanities</option>
-										<option value="English Language Program">ELP - English Language Program</option>
-										<option value="English">ENG - English</option>
-										<option value="Alternative Energy">ERG - Alternative Energy</option>
-										<option value="Film and Media Studies">FMS - Film and Media Studies</option>
-										<option value="Modern Languages &amp; Cultures  French">FR - Modern Languages &amp; Cultures - French</option>
-										<option value="Modern Languages &amp; Cultures  German">GER - Modern Languages &amp; Cultures - German</option>
-										<option value="Gender, Sexuality &amp; Women's Studies">GSW - Gender, Sexuality &amp; Women's Studies</option>
-										<option value="Religion &amp; Classics  Greek">GRK - Religion &amp; Classics - Greek</option>
-										<option value="Religion &amp; Classics  Hebrew">HEB - Religion &amp; Classics - Hebrew</option>
-										<option value="History">HIS - History</option>
-										<option value="Health and Society">HLS - Health and Society</option>
-										<option value="Intensive English Program">IEP - Intensive English Program</option>
-										<option value="International Relations">IR - International Relations</option>
-										<option value="Modern Languages &amp; Cultures  Italian">IT - Modern Languages &amp; Cultures - Italian</option>
-										<option value="Modern Languages &amp; Cultures  Japanese">JPN - Modern Languages &amp; Cultures - Japanese</option>
-										<option value="Judaic Studies">JST - Judaic Studies</option>
-										<option value="Modern Languages &amp; Cultures  Korean">KOR - Modern Languages &amp; Cultures - Korean</option>
-										<option value="Religion &amp; Classics  Latin">LAT - Religion &amp; Classics - Latin</option>
-										<option value="Linguistics">LIN - Linguistics</option>
-										<option value="Literary Translation Studies">LTS - Literary Translation Studies</option>
-										<option value="Mathematics">MTH - Mathematics</option>
-										<option value="Materials Science">MSC - Materials Science</option>
-										<option value="Mechanical Engineering">ME - Mechanical Engineering</option>
-										<option value="Music">MUR - Music</option>
-										<option value="Naval Science">NAV - Naval Science</option>
-										<option value="Neuroscience">NSC - Neuroscience</option>
-										<option value="Optics">OPT - Optics</option>
-										<option value="Wallis Institute of Political Economics">PEC - Wallis Institute of Political Economics</option>
-										<option value="Public Health">PH - Public Health</option>
-										<option value="Philosophy">PHL - Philosophy</option>
-										<option value="Photographic Preservation &amp; Collections Management">PPC - Photographic Preservation &amp; Collections Management</option>
-										<option value="Physics">PHY - Physics</option>
-										<option value="Modern Languages &amp; Cultures  Polish">POL - Modern Languages &amp; Cultures - Polish</option>
-										<option value="Modern Languages &amp; Cultures  Portuguese">POR - Modern Languages &amp; Cultures - Portuguese</option>
-										<option value="Political Science">PSC - Political Science</option>
-										<option value="Psychology">PSY - Psychology</option>
-										<option value="Religion and Classics">REL - Religion and Classics</option>
-										<option value="Modern Languages &amp; Cultures  Russian Studies">RST - Modern Languages &amp; Cultures - Russian Studies</option>
-										<option value="Modern Languages &amp; Cultures  Russian">RUS - Modern Languages &amp; Cultures - Russian</option>
-										<option value="Art &amp; Art HistoryStudio Arts">SA - Art &amp; Art History-Studio Arts</option>
-										<option value="Study Abroad">SAB - Study Abroad</option>
-										<option value="Social Entrepreneurship">SEN - Social Entrepreneurship</option>
-										<option value="Religion &amp; Classics  Sanskrit">SKT - Religion &amp; Classics - Sanskrit</option>
-										<option value="Sociology">SOC - Sociology</option>
-										<option value="Modern Languages &amp; Cultures  Spanish">SP - Modern Languages &amp; Cultures - Spanish</option>
-										<option value="Statistics">STT - Statistics</option>
-										<option value="Sustainability">SUS - Sustainability</option>
-										<option value="TEAM Computer Science">TCS - TEAM Computer Science</option>
-										<option value="TEAM Biomedical Engineering">TEB - TEAM Biomedical Engineering</option>
-										<option value="TEAM Chemical Engineering">TEC - TEAM Chemical Engineering</option>
-										<option value="TEAM Electrical Engineering">TEE - TEAM Electrical Engineering</option>
-										<option value="Technical Entrepreneurship Management">TEM - Technical Entrepreneurship Management</option>
-										<option value="TEAM Optics">TEO - TEAM Optics</option>
-										<option value="TEAM Mechanical Engineering">TME - TEAM Mechanical Engineering</option>
-										<option value="Religion &amp; Classics  Turkis">TUR - Religion &amp; Classics - Turkish</option>
-										<option value="Gender, Sexuality &amp; Women's Studies">WST - Women's Studies (see GSW for current courses)</option>
-										<option value="Writing Program">WRT - Writing Program</option>
-									</Form.Control>
-
-								<div className="sliderbox">
-										<Slider range marks={marks} step={null} tooltipVisible={false} defaultValue={[0,100]} onAfterChange={this.onSliderChange}/>
 								</div>
 
-								<ButtonToolbar xs={12} md={3} lg={2}>
-									<ToggleButtonGroup type="checkbox" defaultValue={[1, 3]}>
-										<ToggleButton value={'MON'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>M</ToggleButton>
-										<ToggleButton value={'TUE'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>T</ToggleButton>
-										<ToggleButton value={'WEN'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>W</ToggleButton>
-										<ToggleButton value={'THU'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>Th</ToggleButton>
-										<ToggleButton value={'FRI'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>F</ToggleButton>
-									</ToggleButtonGroup>
-								</ButtonToolbar>
+								<div id = {v}>
+									<Form.Group as={Col} className="formGroup" controlId="formGridDept">
+										<Form.Control as="select" className="formControl" onChange={(event) => this.searchActionInterpret(event.target.value,"NONE")}>
+											<option hidden>Department</option>
+											<option value="Nothing"></option>
+											<option value="African &amp; African-American Studies">AAS - African &amp; African-American Studies</option>
+											<option value="Art &amp; Art History">AH - Art &amp; Art History</option>
+											<option value="Anthropology">ANT - Anthropology</option>
+											<option value="Religion &amp; Classics  Arabic">ARA - Religion &amp; Classics - Arabic</option>
+											<option value="American Sign Language">ASL - American Sign Language</option>
+											<option value="Audio Music Engineering">AME - Audio Music Engineering</option>
+											<option value="American Studies">AMS - American Studies</option>
+											<option value="Astronomy">AST - Astronomy</option>
+											<option value="Archeology Tech &amp; Hist Structure">ATH - Archeology Tech &amp; Hist Structure</option>
+											<option value="Brain and Cognitive Sciences">BCS - Brain and Cognitive Sciences</option>
+											<option value="Biology">BIO - Biology</option>
+											<option value="Biomedical Engineering">BME - Biomedical Engineering</option>
+											<option value="College of Arts &amp; Science">CAS - College of Arts &amp; Science</option>
+											<option value="Religion &amp; Classics  Classical Greek">CGR - Religion &amp; Classics - Classical Greek</option>
+											<option value="Chemical Engineering">CHE - Chemical Engineering</option>
+											<option value="Modern Languages &amp; Cultures  Chinese">CHI - Modern Languages &amp; Cultures - Chinese</option>
+											<option value="Chemistry">CHM - Chemistry</option>
+											<option value="Religion &amp; Classics  Classical Studies">CLA - Religion &amp; Classics - Classical Studies</option>
+											<option value="Modern Languages &amp; Cultures  Comparative Literature">CLT - Modern Languages &amp; Cultures - Comparative Literature</option>
+											<option value="Computer Science">CSC - Computer Science</option>
+											<option value="Clinical and Social Sciences in Psychology">CSP - Clinical and Social Sciences in Psychology</option>
+											<option value="Center for Visual Science">CVS - Center for Visual Science</option>
+											<option value="Dance">DAN - Dance</option>
+											<option value="Data Science &amp; Computation">DSC - Data Science &amp; Computation</option>
+											<option value="Digital Humanities">DH - Digital Humanities</option>
+											<option value="Digital Media Studies">DMS - Digital Media Studies</option>
+											<option value="Engineering and Applied Sciences">EAS - Engineering and Applied Sciences</option>
+											<option value="Electrical and Computer Engineering">ECE - Electrical and Computer Engineering</option>
+											<option value="Economics">ECO - Economics</option>
+											<option value="Earth &amp; Environmental Science">EES - Earth &amp; Environmental Science</option>
+											<option value="Environmental Humanities">EHU - Environmental Humanities</option>
+											<option value="English Language Program">ELP - English Language Program</option>
+											<option value="English">ENG - English</option>
+											<option value="Alternative Energy">ERG - Alternative Energy</option>
+											<option value="Film and Media Studies">FMS - Film and Media Studies</option>
+											<option value="Modern Languages &amp; Cultures  French">FR - Modern Languages &amp; Cultures - French</option>
+											<option value="Modern Languages &amp; Cultures  German">GER - Modern Languages &amp; Cultures - German</option>
+											<option value="Gender, Sexuality &amp; Women's Studies">GSW - Gender, Sexuality &amp; Women's Studies</option>
+											<option value="Religion &amp; Classics  Greek">GRK - Religion &amp; Classics - Greek</option>
+											<option value="Religion &amp; Classics  Hebrew">HEB - Religion &amp; Classics - Hebrew</option>
+											<option value="History">HIS - History</option>
+											<option value="Health and Society">HLS - Health and Society</option>
+											<option value="Intensive English Program">IEP - Intensive English Program</option>
+											<option value="International Relations">IR - International Relations</option>
+											<option value="Modern Languages &amp; Cultures  Italian">IT - Modern Languages &amp; Cultures - Italian</option>
+											<option value="Modern Languages &amp; Cultures  Japanese">JPN - Modern Languages &amp; Cultures - Japanese</option>
+											<option value="Judaic Studies">JST - Judaic Studies</option>
+											<option value="Modern Languages &amp; Cultures  Korean">KOR - Modern Languages &amp; Cultures - Korean</option>
+											<option value="Religion &amp; Classics  Latin">LAT - Religion &amp; Classics - Latin</option>
+											<option value="Linguistics">LIN - Linguistics</option>
+											<option value="Literary Translation Studies">LTS - Literary Translation Studies</option>
+											<option value="Mathematics">MTH - Mathematics</option>
+											<option value="Materials Science">MSC - Materials Science</option>
+											<option value="Mechanical Engineering">ME - Mechanical Engineering</option>
+											<option value="Music">MUR - Music</option>
+											<option value="Naval Science">NAV - Naval Science</option>
+											<option value="Neuroscience">NSC - Neuroscience</option>
+											<option value="Optics">OPT - Optics</option>
+											<option value="Wallis Institute of Political Economics">PEC - Wallis Institute of Political Economics</option>
+											<option value="Public Health">PH - Public Health</option>
+											<option value="Philosophy">PHL - Philosophy</option>
+											<option value="Photographic Preservation &amp; Collections Management">PPC - Photographic Preservation &amp; Collections Management</option>
+											<option value="Physics">PHY - Physics</option>
+											<option value="Modern Languages &amp; Cultures  Polish">POL - Modern Languages &amp; Cultures - Polish</option>
+											<option value="Modern Languages &amp; Cultures  Portuguese">POR - Modern Languages &amp; Cultures - Portuguese</option>
+											<option value="Political Science">PSC - Political Science</option>
+											<option value="Psychology">PSY - Psychology</option>
+											<option value="Religion and Classics">REL - Religion and Classics</option>
+											<option value="Modern Languages &amp; Cultures  Russian Studies">RST - Modern Languages &amp; Cultures - Russian Studies</option>
+											<option value="Modern Languages &amp; Cultures  Russian">RUS - Modern Languages &amp; Cultures - Russian</option>
+											<option value="Art &amp; Art HistoryStudio Arts">SA - Art &amp; Art History-Studio Arts</option>
+											<option value="Study Abroad">SAB - Study Abroad</option>
+											<option value="Social Entrepreneurship">SEN - Social Entrepreneurship</option>
+											<option value="Religion &amp; Classics  Sanskrit">SKT - Religion &amp; Classics - Sanskrit</option>
+											<option value="Sociology">SOC - Sociology</option>
+											<option value="Modern Languages &amp; Cultures  Spanish">SP - Modern Languages &amp; Cultures - Spanish</option>
+											<option value="Statistics">STT - Statistics</option>
+											<option value="Sustainability">SUS - Sustainability</option>
+											<option value="TEAM Computer Science">TCS - TEAM Computer Science</option>
+											<option value="TEAM Biomedical Engineering">TEB - TEAM Biomedical Engineering</option>
+											<option value="TEAM Chemical Engineering">TEC - TEAM Chemical Engineering</option>
+											<option value="TEAM Electrical Engineering">TEE - TEAM Electrical Engineering</option>
+											<option value="Technical Entrepreneurship Management">TEM - Technical Entrepreneurship Management</option>
+											<option value="TEAM Optics">TEO - TEAM Optics</option>
+											<option value="TEAM Mechanical Engineering">TME - TEAM Mechanical Engineering</option>
+											<option value="Religion &amp; Classics  Turkis">TUR - Religion &amp; Classics - Turkish</option>
+											<option value="Gender, Sexuality &amp; Women's Studies">WST - Women's Studies (see GSW for current courses)</option>
+											<option value="Writing Program">WRT - Writing Program</option>
+										</Form.Control>
 
-								</Form.Group>
-								
+									<div className="sliderbox">
+											<Slider range marks={marks} step={null} tooltipVisible={false} defaultValue={[0,100]} onAfterChange={this.onSliderChange}/>
+									</div>
+
+									<ButtonToolbar xs={12} md={3} lg={2}>
+										<ToggleButtonGroup type="checkbox" defaultValue={[1, 3]} id="weekBar">
+											<ToggleButton value={'MON'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>M</ToggleButton>
+											<ToggleButton value={'TUE'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>T</ToggleButton>
+											<ToggleButton value={'WEN'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>W</ToggleButton>
+											<ToggleButton value={'THU'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>Th</ToggleButton>
+											<ToggleButton value={'FRI'} onChange={(event) => this.searchActionInterpret('NONE', event.target.value)}>F</ToggleButton>
+										</ToggleButtonGroup>
+									</ButtonToolbar>
+
+									</Form.Group>
+								</div>
 							</div>
 						</Col>
 						<Col xs={12} md={7} lg={7}>
@@ -617,15 +663,13 @@ render(){
 							{this.state.courses}
 						</Col>
 						<Col xs={0} md={2} lg={1}>
-								<OverlayTrigger trigger="click" placement="left" overlay={popover}>
-									<Button className="schedulePop btn-info" variant="success">Schedule</Button>
-								</OverlayTrigger>
-
-								<OverlayTrigger  trigger="click" placement="left" overlay={popover}>
-									<Button className="dashPop btn-info" variant="success">Dashboard</Button>
-								</OverlayTrigger>
-							
-
+			                <OverlayTrigger trigger="click" placement="left" overlay={popover}>
+			                  <Button className="schedulePop btn-info" variant="success" id="extraBtn">Schedule</Button>
+			                </OverlayTrigger>
+			 
+			                <OverlayTrigger  trigger="click" placement="left" overlay={popover}>
+			                  <Button className="dashPop btn-info" variant="success" id="extraBtn">Dashboard</Button>
+			                </OverlayTrigger>
 						</Col>
 						<Col xs={0} md={0} lg={1}>
 						</Col>
